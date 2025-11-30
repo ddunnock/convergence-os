@@ -9,7 +9,12 @@ import userEvent from "@testing-library/user-event";
 import { ThemeSwitcher } from "./theme-switcher";
 import { ThemeProvider, resetThemeState } from "../providers/theme-provider";
 
-// Wrapper component for testing
+/**
+ * Test wrapper providing ThemeProvider context.
+ * @param props - Component props
+ * @param props.children - Child components to wrap
+ * @returns ThemeProvider with children
+ */
 function TestWrapper({ children }: { children: React.ReactNode }) {
   return <ThemeProvider>{children}</ThemeProvider>;
 }
@@ -427,6 +432,10 @@ describe("ThemeSwitcher", () => {
     it("does not re-render excessively on parent re-render", async () => {
       let renderCount = 0;
 
+      /**
+       * Tracks render count for ThemeSwitcher performance testing.
+       * @returns ThemeSwitcher component
+       */
       function CountingThemeSwitcher() {
         renderCount++;
         return <ThemeSwitcher />;

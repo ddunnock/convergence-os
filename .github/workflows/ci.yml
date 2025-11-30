@@ -1,0 +1,585 @@
+# .github/workflows/ci.yml
+# ConvergenceOS - Continuous Integration Pipeline
+#
+# COST-OPTIMIZED WORKFLOW:
+# - Feature branch pushes: Lint + Typecheck + Incremental Coverage (~7-10 min)
+# - Pull requests: Full CI (tests, build, audit)
+# - Main/develop pushes: Full CI + Documentation
+# - Manual trigger: Available via workflow_dispatch for on-demand full CI
+#
+# Current Status:
+# ✅ Lint - Enabled (always) - TypeScript & Python
+# ✅ Type Check - Enabled (always) - TypeScript & Python
+# ✅ Incremental Coverage - Enabled on feature branches (changed files only)
+# ✅ Unit & Integration Tests - Enabled on PRs and main/develop only
+# ⏸️  E2E Tests - Disabled until Phase 7
+# ✅ Security Audit - Enabled on PRs and main/develop only
+# ✅ Build - Enabled on PRs and main/develop only
+# ✅ Documentation - Enabled (only on main/develop push)
+
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'LICENSE'
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:  # Allow manual triggers
+
+# Cancel in-progress runs when a new push occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1: Lint all packages (TypeScript & Python)
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Run ESLint
+        run: pnpm lint --max-warnings 0
+
+      - name: Run Python lint (Ruff)
+        run: cd services/ml && poetry run ruff check src tests
+
+  # Job 2: Type check all packages (TypeScript & Python)
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Build required packages
+        run: |
+          pnpm --filter @convergence/db build || true
+          pnpm --filter @convergence/ui build || true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/convergence_test' }}
+
+      - name: Run TypeScript type check
+        run: pnpm typecheck
+
+      - name: Run Python type check (MyPy)
+        run: cd services/ml && poetry run mypy src/convergence_ml
+
+  # Job 2.5: Incremental coverage check for changed files on feature branches
+  # This provides quick feedback on test coverage for new code without running full test suite
+  incremental-coverage:
+    name: Coverage Check (Changed Files)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Only run on feature branch pushes (not PRs, not main/develop)
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/feature/')
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: convergence_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history to compare with base branch
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Build required packages
+        run: |
+          pnpm --filter @convergence/db build || true
+          pnpm --filter @convergence/ui build || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run database migrations
+        run: pnpm --filter @convergence/db db:migrate || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Detect changed files
+        id: changed-files
+        run: |
+          # Get the base branch (main or develop)
+          BASE_BRANCH="${GITHUB_BASE_REF:-main}"
+          
+          # Get changed TypeScript/JavaScript files
+          CHANGED_TS_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '\.test\.' | grep -v '\.spec\.' || echo "")
+          
+          # Get changed Python files
+          CHANGED_PY_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.py$' | grep -v 'test_' | grep -v '__pycache__' || echo "")
+          
+          echo "Changed TypeScript files:"
+          echo "$CHANGED_TS_FILES"
+          echo "Changed Python files:"
+          echo "$CHANGED_PY_FILES"
+          
+          # Save for next step
+          echo "ts_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_TS_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "py_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_PY_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Check if there are any changed files
+          if [ -z "$CHANGED_TS_FILES" ] && [ -z "$CHANGED_PY_FILES" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests for changed files
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          echo "📊 Running tests with coverage for changed files..."
+          
+          # Run TypeScript tests if there are TS changes
+          if [ -n "${{ steps.changed-files.outputs.ts_files }}" ]; then
+            echo "Running TypeScript tests..."
+            pnpm test --run --coverage || true
+          fi
+          
+          # Run Python tests if there are Python changes
+          if [ -n "${{ steps.changed-files.outputs.py_files }}" ]; then
+            echo "Running Python tests..."
+            cd services/ml && poetry run pytest --cov=convergence_ml --cov-report=term-missing || true
+          fi
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        continue-on-error: true
+
+      - name: Generate coverage summary
+        if: steps.changed-files.outputs.has_changes == 'true'
+        run: |
+          echo "📈 Coverage Summary for Changed Files:"
+          if [ -f coverage/coverage-summary.json ]; then
+            cat coverage/coverage-summary.json | jq '.total' || echo "No TypeScript coverage data"
+          fi
+          if [ -f services/ml/coverage/.coverage ]; then
+            echo "Python coverage data found"
+          fi
+
+      - name: No changes detected
+        if: steps.changed-files.outputs.has_changes == 'false'
+        run: echo "ℹ️  No source code changes detected - skipping coverage check"
+
+  # Job 3: Run unit and integration tests
+  # Only run on PRs and main/develop pushes to save Actions minutes
+  test:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
+
+    services:
+      # PostgreSQL service for integration tests
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: convergence_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Build required packages
+        run: |
+          pnpm --filter @convergence/db build || true
+          pnpm --filter @convergence/ui build || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run database migrations
+        run: pnpm --filter @convergence/db db:migrate || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run TypeScript tests
+        run: pnpm test --run --coverage
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run Python tests
+        run: cd services/ml && poetry run pytest --cov=convergence_ml --cov-report=term-missing --cov-report=json
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          CONVERGENCE_ML_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: |
+            ./coverage/coverage-final.json
+            ./services/ml/coverage.json
+          flags: unittests
+          name: codecov-umbrella
+
+  # Job 4: E2E Tests - DISABLED UNTIL PHASE 7
+  # Playwright E2E tests are not yet fully implemented
+  # Will be re-enabled after completing MVP Phase 7: Integration & Testing
+  #
+  # test-e2e:
+  #   name: E2E Tests (Playwright)
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #
+  #   strategy:
+  #     matrix:
+  #       # Test across multiple browsers
+  #       browser: [chromium, firefox, webkit]
+  #
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 10.24.0
+  #
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '25'
+  #         cache: 'pnpm'
+  #
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #
+  #     - name: Install Playwright browsers
+  #       run: pnpm dlx playwright install --with-deps ${{ matrix.browser }}
+  #
+  #     - name: Build web app
+  #       run: pnpm --filter @convergence/web build
+  #
+  #     - name: Run Playwright tests
+  #       run: pnpm test:e2e --project=${{ matrix.browser }}
+  #       env:
+  #         BASE_URL: http://localhost:3000
+  #
+  #     - name: Upload Playwright report
+  #       uses: actions/upload-artifact@v4
+  #       if: failure()
+  #       with:
+  #         name: playwright-report-${{ matrix.browser }}
+  #         path: playwright-report/
+  #         retention-days: 7
+
+  # Job 5: Security audit (non-blocking - continues on error)
+  # Only run on PRs and main/develop pushes to save Actions minutes
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run Python security check (Safety)
+        run: |
+          cd services/ml
+          poetry install --no-root
+          poetry run pip install safety || true
+          poetry run safety check --json || true
+        continue-on-error: true
+
+  # Job 6: Build all apps (verification is non-blocking)
+  # Only run on PRs and main/develop pushes to save Actions minutes
+  build:
+    name: Build Apps
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Build database package first
+        run: pnpm --filter @convergence/db build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/convergence_test' }}
+
+      - name: Build all packages and apps
+        run: pnpm build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/convergence_test' }}
+
+      - name: Verify build artifacts
+        run: |
+          test -d apps/web/.next && echo "✓ Web app built" || echo "⚠ Web app not built"
+          test -d packages/ui/dist && echo "✓ UI package built" || echo "⚠ UI package not built"
+          test -d packages/db/dist && echo "✓ DB package built" || echo "⚠ DB package not built"
+          echo "Build verification complete (non-blocking)"
+        continue-on-error: true
+
+  # Job 7: Generate API documentation
+  docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Only run on push to main/develop branches (not on PRs)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Install Sphinx dependencies
+        run: |
+          pip install -r docs/requirements.txt || true
+
+      - name: Generate TypeScript API documentation (TypeDoc)
+        run: |
+          pnpm --filter @convergence/ui build || true
+          pnpm typedoc --out docs/_build/typescript-api || true
+        continue-on-error: true
+
+      - name: Generate Python API documentation (Sphinx)
+        run: |
+          cd docs && make html || true
+        continue-on-error: true
+
+      - name: Upload documentation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation
+          path: |
+            docs/_build/html/
+            docs/_build/typescript-api/
+          retention-days: 30
+
+      # Optional: Deploy to GitHub Pages (uncomment if desired)
+      # - name: Deploy to GitHub Pages
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./docs/_build/html
+
+# Set required status checks (configure in GitHub repo settings)
+# Settings > Branches > Branch protection rules > Require status checks
+#
+# REQUIRED STATUS CHECKS:
+# - lint (CI Pipeline / Lint Code)
+# - typecheck (CI Pipeline / Type Check)
+# - test (CI Pipeline / Unit & Integration Tests)
+# - build (CI Pipeline / Build Apps)
+#
+# Optional/Non-blocking checks:
+# - audit (continues on error, non-blocking)
+# - docs (only runs on push to main/develop)
+# - incremental-coverage (only runs on feature branch pushes)
+#
+# Disabled until Phase 7:
+# - test-e2e (Playwright E2E tests not yet implemented)

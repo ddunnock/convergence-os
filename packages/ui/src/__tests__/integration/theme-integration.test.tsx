@@ -22,6 +22,10 @@ describe("Theme System Integration", () => {
     it("ThemeSwitcher changes propagate to ThemeProvider state", async () => {
       const user = userEvent.setup();
 
+      /**
+       * Displays current theme state for testing.
+       * @returns React element with theme variant and color mode
+       */
       function ThemeDisplay() {
         const { themeVariant, colorMode } = useTheme();
         return (
@@ -248,6 +252,10 @@ describe("Theme System Integration", () => {
 
   describe("Nested Provider Behavior", () => {
     it("Child components receive theme from nearest provider", async () => {
+      /**
+       * Displays current theme variant for testing.
+       * @returns React element with theme variant
+       */
       function ThemeDisplay() {
         const { themeVariant } = useTheme();
         return <span data-testid="display">{themeVariant}</span>;
@@ -269,6 +277,10 @@ describe("Theme System Integration", () => {
     it("Handles multiple rapid changes across components", async () => {
       const user = userEvent.setup();
 
+      /**
+       * Counter component for testing concurrent theme changes.
+       * @returns React element with combined theme state
+       */
       function Counter() {
         const { themeVariant, colorMode } = useTheme();
         return (
@@ -314,6 +326,10 @@ describe("Theme System Integration", () => {
     it("Theme context throws outside provider with clear message", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
+      /**
+       * Component that uses useTheme outside provider for error testing.
+       * @returns Null (should throw before returning)
+       */
       function InvalidComponent() {
         useTheme(); // Should throw
         return null;
@@ -331,6 +347,10 @@ describe("Theme System Integration", () => {
     it("Complete theme customization flow works end-to-end", async () => {
       const user = userEvent.setup();
 
+      /**
+       * Displays full theme status for end-to-end testing.
+       * @returns React element with all theme state properties
+       */
       function ThemeStatus() {
         const { themeVariant, colorMode, resolvedColorMode, mounted } = useTheme();
         return (

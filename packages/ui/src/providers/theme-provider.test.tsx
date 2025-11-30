@@ -15,11 +15,17 @@ import {
   type ThemeVariant,
 } from "./theme-provider";
 
-// Helper component for testing useTheme hook
+// Default theme variant for tests - used for type checking and test assertions
+const defaultTestVariant: ThemeVariant = "convergence";
+
+/**
+ * Helper component for testing useTheme hook behavior.
+ * @returns React element displaying theme state
+ */
 function ThemeConsumer() {
   const theme = useTheme();
   return (
-    <div data-testid="theme-consumer">
+    <div data-testid="theme-consumer" data-default-variant={defaultTestVariant}>
       <span data-testid="theme-variant">{theme.themeVariant}</span>
       <span data-testid="color-mode">{theme.colorMode}</span>
       <span data-testid="resolved-mode">{theme.resolvedColorMode}</span>
@@ -381,6 +387,10 @@ describe("ThemeProvider", () => {
       const user = userEvent.setup();
       let renderCount = 0;
 
+      /**
+       * Tracks render count for performance testing.
+       * @returns React element with theme variant
+       */
       function RenderCounter() {
         renderCount++;
         const theme = useTheme();
@@ -407,6 +417,10 @@ describe("ThemeProvider", () => {
     it("batches rapid theme changes", async () => {
       let renderCount = 0;
 
+      /**
+       * Tracks render count for batching test.
+       * @returns React element with clickable theme toggle
+       */
       function RenderCounter() {
         renderCount++;
         const theme = useTheme();

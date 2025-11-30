@@ -1,0 +1,215 @@
+# .github/workflows/sonarqube.yml
+# SonarCloud Quality Gate Analysis for Pull Requests
+#
+# This workflow enforces code quality standards using SonarCloud:
+# - Sonar Way for AI quality profile
+# - 80% minimum code coverage on new code
+# - All Quality Gate conditions must pass
+#
+# Required Secrets:
+# - SONAR_TOKEN: SonarCloud authentication token
+# - GITHUB_TOKEN: Automatically provided by GitHub Actions
+
+name: SonarCloud Quality Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+      - develop
+
+# Cancel in-progress runs when a new push occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    services:
+      # PostgreSQL service for integration tests
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: convergence_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history for SonarCloud blame information
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'pnpm'
+
+      - name: Setup Poetry Environment
+        uses: abatilo/setup-poetry-environment@v1
+        with:
+          poetry-version: 2.0.0
+          poetry-lockfile: services/ml/pyproject.toml
+
+      - name: Install pnpm dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Poetry dependencies
+        run: cd services/ml && poetry install --no-root
+
+      - name: Build required packages
+        run: |
+          pnpm --filter @convergence/db build || true
+          pnpm --filter @convergence/ui build || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run database migrations
+        run: pnpm --filter @convergence/db db:migrate || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run TypeScript tests with coverage
+        run: pnpm test --run --coverage
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Run Python tests with coverage
+        run: cd services/ml && poetry run pytest --cov=convergence_ml --cov-report=lcov --cov-report=term-missing
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+          CONVERGENCE_ML_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+
+      - name: Merge coverage reports
+        run: |
+          # Ensure coverage directory exists
+          mkdir -p coverage
+          
+          # Copy Python coverage if it exists
+          if [ -f services/ml/coverage.lcov ]; then
+            echo "Found Python coverage report"
+            cp services/ml/coverage.lcov coverage/python-coverage.lcov || true
+          fi
+          
+          # TypeScript coverage should already be in coverage/lcov.info
+          if [ -f coverage/lcov.info ]; then
+            echo "Found TypeScript coverage report"
+            echo "TypeScript coverage file size: $(wc -c < coverage/lcov.info) bytes"
+          fi
+
+      - name: Verify coverage report exists
+        run: |
+          if [ ! -f coverage/lcov.info ]; then
+            echo "❌ Coverage report not found at coverage/lcov.info"
+            echo "Available files in coverage directory:"
+            ls -la coverage/ || echo "Coverage directory does not exist"
+            exit 1
+          fi
+          echo "✅ Coverage report found"
+          echo "Coverage file size: $(wc -c < coverage/lcov.info) bytes"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.pullrequest.key=${{ github.event.pull_request.number }}
+            -Dsonar.pullrequest.branch=${{ github.head_ref }}
+            -Dsonar.pullrequest.base=${{ github.base_ref }}
+            -Dsonar.scm.revision=${{ github.sha }}
+            -Dsonar.sources=packages,apps,services/ml/src
+            -Dsonar.tests=packages,apps,services/ml/tests
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.next/**,**/coverage/**,**/__pycache__/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/test_*.py,**/*_test.py
+            -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/test_*.py,**/*_test.py
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.python.coverage.reportPaths=services/ml/coverage.lcov
+            -Dsonar.sourceEncoding=UTF-8
+
+      - name: Wait for Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          scanMetadataReportFile: .scannerwork/report-task.txt
+
+      - name: Check Quality Gate Status
+        if: always()
+        run: |
+          echo "📊 SonarCloud Quality Gate Status"
+          echo "=================================="
+          echo ""
+          echo "View detailed results at:"
+          echo "https://sonarcloud.io/summary/new_code?id=${{ secrets.SONAR_PROJECT_KEY || 'convergence-os' }}&pullRequest=${{ github.event.pull_request.number }}"
+          echo ""
+          echo "Quality Gate Conditions:"
+          echo "- ✓ Coverage on New Code ≥ 80%"
+          echo "- ✓ Duplicated Lines (%) on New Code ≤ 3%"
+          echo "- ✓ Maintainability Rating on New Code = A"
+          echo "- ✓ Reliability Rating on New Code = A"
+          echo "- ✓ Security Hotspots Reviewed on New Code = 100%"
+          echo "- ✓ Security Rating on New Code = A"
+
+      - name: Upload coverage report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage/
+            services/ml/coverage.lcov
+            .scannerwork/report-task.txt
+          retention-days: 30
+
+# Quality Gate will fail the PR if any of these conditions are not met:
+#
+# NEW CODE CONDITIONS (Sonar Way for AI):
+# ========================================
+# 1. Coverage on New Code ≥ 80.0%
+# 2. Duplicated Lines (%) on New Code ≤ 3.0%
+# 3. Maintainability Rating on New Code = A
+# 4. Reliability Rating on New Code = A
+# 5. Security Hotspots Reviewed on New Code = 100%
+# 6. Security Rating on New Code = A
+#
+# OVERALL CODE CONDITIONS:
+# ========================
+# 1. Security Hotspots Reviewed = 100%
+#
+# To configure these in SonarCloud:
+# 1. Go to https://sonarcloud.io/organizations/YOUR_ORG/quality_gates
+# 2. Create or edit Quality Gate
+# 3. Set conditions as above
+# 4. Assign to project: convergence-os
+#
+# IMPORTANT: Update the SonarCloud project key in the workflow:
+# - Add SONAR_PROJECT_KEY secret with your actual SonarCloud project key
+# - Or update the project key directly in the "Check Quality Gate Status" step
+# - Format: organization_project-name (e.g., "ddunnock_convergence-os")

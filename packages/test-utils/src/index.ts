@@ -259,7 +259,8 @@ export function assertNoA11yViolations(container: HTMLElement): void {
   const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6"));
   let lastLevel = 0;
   headings.forEach((heading) => {
-    const level = parseInt(heading.tagName[1], 10);
+    const levelChar = heading.tagName[1];
+    const level = levelChar ? parseInt(levelChar, 10) : 1;
     if (level > lastLevel + 1 && lastLevel !== 0) {
       console.warn(
         `Heading hierarchy skip: h${lastLevel} to h${level}. Consider using proper heading levels.`

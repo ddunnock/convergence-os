@@ -16,8 +16,12 @@ import {
   DialogFooter,
   DialogTitle,
   DialogDescription,
-} from "./dialog";
-import { Button } from "./button";
+  Button,
+} from "./index";
+
+// Verify component types are exported (these components are used via data-slot attributes in tests)
+const _verifyExports: [typeof DialogClose, typeof DialogOverlay] = [DialogClose, DialogOverlay];
+void _verifyExports;
 
 // Mock lucide-react icons
 vi.mock("lucide-react", () => ({

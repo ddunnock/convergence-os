@@ -207,6 +207,7 @@ if (typeof window !== "undefined") {
  * @param props - Component props
  * @param props.children - Child components
  * @param props.defaultVariant - Default theme variant for SSR
+ * @returns Theme variant context provider with children
  */
 function ThemeVariantProvider({
   children,

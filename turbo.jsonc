@@ -89,6 +89,49 @@
     "db:studio": {
       "cache": false,
       "persistent": true
+    },
+    "ml:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "ml:serve": {
+      "cache": false,
+      "persistent": true
+    },
+    "ml:worker": {
+      "cache": false,
+      "persistent": true
+    },
+    "ml:test": {
+      "outputs": ["coverage/**", ".coverage", "htmlcov/**"],
+      "dependsOn": [],
+      "env": [
+        "TEST_DATABASE_URL",
+        "CONVERGENCE_ML_*"
+      ]
+    },
+    "ml:test:watch": {
+      "cache": false,
+      "persistent": true
+    },
+    "ml:lint": {
+      "dependsOn": []
+    },
+    "ml:lint:fix": {
+      "cache": false
+    },
+    "ml:format": {
+      "cache": false
+    },
+    "ml:typecheck": {
+      "dependsOn": []
+    },
+    "ml:models:download": {
+      "cache": false,
+      "outputs": ["model_artifacts/**"]
+    },
+    "ml:models:list": {
+      "cache": false
     }
   }
 }

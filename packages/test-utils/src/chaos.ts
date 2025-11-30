@@ -130,7 +130,10 @@ export function corruptLocalStorage(
     "null-bytes": "theme\x00variant",
   };
 
-  localStorage.setItem(key, corruptions[corruptionType]);
+  const corruptedValue = corruptions[corruptionType];
+  if (corruptedValue !== undefined) {
+    localStorage.setItem(key, corruptedValue);
+  }
 }
 
 /**
@@ -265,8 +268,11 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
   ];
 
   for (let i = 0; i < count; i++) {
-    const generator = generators[Math.floor(Math.random() * generators.length)];
-    fuzzedValues.push(generator());
+    const randomIndex = Math.floor(Math.random() * generators.length);
+    const generator = generators[randomIndex];
+    if (generator) {
+      fuzzedValues.push(generator());
+    }
   }
 
   return fuzzedValues;
