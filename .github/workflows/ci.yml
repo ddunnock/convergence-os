@@ -47,6 +47,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
+    strategy:
+      matrix:
+        python-version: ['3.12'],
+        poetry-version: ['2.0.0']
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,23 +61,33 @@ jobs:
         with:
           version: 10.24.0
 
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+    
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v4
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v4
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+            path: ./services/ml/.venv
+            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+      - name: Install project dependencies
+        run: cd services/ml && poetry install --no-root
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '25'
           cache: 'pnpm'
 
-      - name: Setup Poetry Environment
-        uses: abatilo/setup-poetry-environment@v1
-        with:
-          poetry-version: 2.0.0
-          poetry-lockfile: services/ml/pyproject.toml
-
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install Poetry dependencies
-        run: cd services/ml && poetry install --no-root
 
       - name: Run ESLint
         run: pnpm lint --max-warnings 0
