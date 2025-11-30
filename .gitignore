@@ -16,6 +16,9 @@ node_modules/
 **/coverage/
 **/coverage/**
 *.lcov
+coverage.xml
+.coverage
+htmlcov/
 
 # next.js
 /.next/

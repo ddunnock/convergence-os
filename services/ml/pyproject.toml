@@ -60,7 +60,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-addopts = "--cov=convergence_ml --cov-report=term-missing"
+addopts = """
+    --cov=convergence_ml 
+    --cov-report=term-missing 
+    --cov-report=xml:coverage.xml
+    --cov-report=html
+    """
 
 [tool.mypy]
 python_version = "3.12"
