@@ -1,3 +1,5 @@
+sphinx-autodoc-typehints
+
 # Sphinx documentation dependencies
 sphinx>=7.0
 sphinx-js>=5.0

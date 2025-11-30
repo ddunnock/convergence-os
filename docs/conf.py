@@ -20,18 +20,18 @@ release = "0.1.0"
 
 extensions = [
     # TypeScript/JavaScript documentation
-    "sphinx_js",
+    # NOTE: sphinx_js disabled due to parsing issues with JSDoc @description tags
+    # Use TypeDoc directly for TS docs: `npx typedoc`
+    # "sphinx_js",
     # Python documentation
     "sphinx.ext.autodoc",
     "sphinx.ext.autodoc.typehints",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",  # Google/NumPy style docstrings
-    "sphinx_autodoc_typehints",  # Better type hint rendering
     # UI components
     "sphinx_design",
 ]
-
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
@@ -74,10 +74,6 @@ napoleon_use_keyword = True
 napoleon_preprocess_types = True
 napoleon_attr_annotations = True
 
-# sphinx-autodoc-typehints settings
-typehints_defaults = "braces"
-simplify_optional_unions = True
-
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "furo"  # Modern, clean theme with good navigation
@@ -89,14 +85,19 @@ html_theme_options = {
     "sidebar_hide_name": False,
     "navigation_with_keys": True,
     "light_css_variables": {
-        "color-brand-primary": "#4f46e5",
-        "color-brand-content": "#4f46e5",
+        "color-brand-primary": "hsl(262, 83%, 58%)",  # Convergence purple
+        "color-brand-content": "hsl(262, 83%, 58%)",
     },
     "dark_css_variables": {
-        "color-brand-primary": "#818cf8",
-        "color-brand-content": "#818cf8",
+        "color-brand-primary": "hsl(262, 83%, 65%)",  # Brighter purple for dark
+        "color-brand-content": "hsl(262, 83%, 65%)",
     },
 }
+
+# Custom CSS files
+html_css_files = [
+    "custom.css",
+]
 
 # -- Intersphinx configuration -----------------------------------------------
 

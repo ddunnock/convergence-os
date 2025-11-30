@@ -50,6 +50,22 @@ next-env.d.ts
 # documentation build output
 docs/_build/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+*.egg-info/
+.eggs/
+*.egg
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
 # turbo
 .turbo/
 
