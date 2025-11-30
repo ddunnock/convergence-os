@@ -239,13 +239,30 @@ body::after {
 }
 
 .sidebar-tree .current > .reference {
-  background: var(--convergence-accent);
+  background: var(--convergence-accent) !important;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: var(--convergence-primary);
+  color: var(--convergence-primary) !important;
   border-radius: var(--convergence-radius);
   border: 1px solid var(--convergence-glass-border);
   font-weight: 600;
+}
+
+/* Remove black/dark background from active page in sidebar */
+.sidebar-tree .current-page > .reference {
+  background: var(--convergence-accent) !important;
+  color: var(--convergence-primary) !important;
+}
+
+/* Remove black from current navigation section */
+.sidebar-tree .current > .reference,
+.sidebar-tree .current-page > .reference {
+  background-color: transparent !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--convergence-accent) 100%
+  ) !important;
 }
 
 /* ============================================================================
@@ -369,7 +386,7 @@ code {
   background: var(--convergence-glass-strong);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  color: var(--convergence-accent-foreground);
+  color: var(--convergence-primary) !important;
   padding: 0.125rem 0.375rem;
   border-radius: var(--convergence-radius);
   font-size: 0.875em;
@@ -390,16 +407,167 @@ pre {
 
 pre code {
   background-color: transparent;
-  color: var(--convergence-foreground);
+  color: var(--convergence-foreground) !important;
   padding: 0;
   border: none;
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
+/* Syntax highlighting - Purple/Indigo theme colors */
+.highlight .k,    /* keyword */
+.highlight .kn,   /* keyword namespace */
+.highlight .kd,   /* keyword declaration */
+.highlight .kt {
+  /* keyword type */
+  color: #a78bfa !important; /* Purple-400 */
+}
+
+.highlight .s,    /* string */
+.highlight .s1,   /* string single */
+.highlight .s2,   /* string double */
+.highlight .sa,   /* string affix */
+.highlight .sb,   /* string backtick */
+.highlight .sc {
+  /* string char */
+  color: #4facfe !important; /* Aurora cyan */
+}
+
+.highlight .n,    /* name */
+.highlight .na,   /* name attribute */
+.highlight .nc,   /* name class */
+.highlight .nf {
+  /* name function */
+  color: #818cf8 !important; /* Indigo-400 */
+}
+
+.highlight .c,    /* comment */
+.highlight .c1,   /* comment single */
+.highlight .cm {
+  /* comment multi */
+  color: #9ca3af !important; /* Gray-400 */
+  font-style: italic;
+}
+
+.highlight .o,    /* operator */
+.highlight .ow {
+  /* operator word */
+  color: #c084fc !important; /* Purple-400 */
+}
+
+.highlight .m,    /* number */
+.highlight .mi,   /* number integer */
+.highlight .mf,   /* number float */
+.highlight .mb,   /* number binary */
+.highlight .mo,   /* number octal */
+.highlight .mh {
+  /* number hex */
+  color: #f472b6 !important; /* Pink-400 */
+}
+
+.highlight .nb {
+  /* builtin */
+  color: #667eea !important; /* Aurora primary */
+}
+
+.highlight .bp {
+  /* builtin pseudo */
+  color: #818cf8 !important; /* Indigo-400 */
+}
+
+/* Additional Pygments token classes that might have brown colors */
+.highlight .err {
+  /* error */
+  color: #ef4444 !important; /* Red */
+}
+
+.highlight .p {
+  /* punctuation */
+  color: var(--convergence-foreground) !important;
+}
+
+.highlight .nn {
+  /* name namespace */
+  color: #667eea !important; /* Aurora primary */
+}
+
+.highlight .nt {
+  /* name tag */
+  color: #818cf8 !important; /* Indigo-400 */
+}
+
+.highlight .nv {
+  /* name variable */
+  color: #c084fc !important; /* Purple-400 */
+}
+
+.highlight .vi,   /* variable instance */
+.highlight .vg,   /* variable global */
+.highlight .vc {
+  /* variable class */
+  color: #c084fc !important; /* Purple-400 */
+}
+
+.highlight .si {
+  /* string interpolated */
+  color: #4facfe !important; /* Aurora cyan */
+}
+
+.highlight .sr {
+  /* string regex */
+  color: #10b981 !important; /* Green */
+}
+
+.highlight .se {
+  /* string escape */
+  color: #f59e0b !important; /* Amber */
+}
+
+.highlight .nl {
+  /* name label */
+  color: #667eea !important; /* Aurora primary */
+}
+
+.highlight .kc {
+  /* keyword constant (true, false, null) */
+  color: #f472b6 !important; /* Pink */
+}
+
+.highlight .kr {
+  /* keyword reserved */
+  color: #a78bfa !important; /* Purple-400 */
+}
+
+/* Ensure ALL text in highlight blocks uses our colors, not brown */
+.highlight span {
+  color: inherit !important;
+}
+
+/* Generic tokens that might be showing as brown */
+.highlight .g,    /* generic */
+.highlight .gd,   /* generic deleted */
+.highlight .ge,   /* generic emph */
+.highlight .gr,   /* generic error */
+.highlight .gh,   /* generic heading */
+.highlight .gi,   /* generic inserted */
+.highlight .go,   /* generic output */
+.highlight .gp,   /* generic prompt */
+.highlight .gs,   /* generic strong */
+.highlight .gu,   /* generic subheading */
+.highlight .gt {
+  /* generic traceback */
+  color: var(--convergence-foreground) !important;
+}
+
 /* Syntax highlighting adjustments */
 .highlight {
   border-radius: var(--convergence-radius-lg);
+}
+
+/* Override Pygments default brownish colors with Aurora purple/indigo theme */
+.highlight pre {
+  background: var(--convergence-glass) !important;
+  color: var(--convergence-foreground) !important;
 }
 
 /* ============================================================================
@@ -559,20 +727,27 @@ button:hover,
    SEARCH BOX
    ============================================================================ */
 
-.search-input {
-  background: var(--convergence-glass);
+.search-input,
+.sidebar-search input,
+input[type="search"],
+input[type="text"] {
+  background: var(--convergence-glass) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--convergence-glass-border);
+  border: 1px solid var(--convergence-glass-border) !important;
   border-radius: var(--convergence-radius);
-  color: var(--convergence-foreground);
+  color: var(--convergence-foreground) !important;
   padding: 0.5rem 1rem;
   transition: all 0.2s ease;
 }
 
-.search-input:focus {
+.search-input:focus,
+.sidebar-search input:focus,
+input[type="search"]:focus,
+input[type="text"]:focus {
   outline: none;
-  border-color: var(--convergence-primary);
+  border-color: var(--convergence-primary) !important;
+  background: var(--convergence-glass-strong) !important;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
