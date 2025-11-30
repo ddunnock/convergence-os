@@ -90,7 +90,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: turbo run lint -- --max-warnings=0
+        run: pnpm lint
 
       - name: Run Python lint (Ruff)
         run: cd services/ml && poetry run ruff check src tests
