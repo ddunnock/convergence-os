@@ -144,7 +144,8 @@ class SpamClassifier(BaseClassifier):
                         random_state=42,
                     ),
                 ),
-            ]
+            ],
+            memory=None,  # Can be set to cache transformers for faster retraining
         )
 
     def train(
@@ -176,7 +177,7 @@ class SpamClassifier(BaseClassifier):
         )
 
         # Split data
-        X_train, X_val, y_train, y_val = train_test_split(
+        x_train, x_val, y_train, y_val = train_test_split(
             texts,
             labels,
             test_size=validation_split,
@@ -186,14 +187,14 @@ class SpamClassifier(BaseClassifier):
 
         # Create and train pipeline
         self._pipeline = self._create_pipeline()
-        self._pipeline.fit(X_train, y_train)
+        self._pipeline.fit(x_train, y_train)
 
         # Store feature names for interpretability
         tfidf = self._pipeline.named_steps["tfidf"]
         self._feature_names = tfidf.get_feature_names_out().tolist()
 
         # Evaluate on validation set
-        y_pred = self._pipeline.predict(X_val)
+        y_pred = self._pipeline.predict(x_val)
 
         metrics = {
             "accuracy": float(accuracy_score(y_val, y_pred)),
@@ -204,8 +205,8 @@ class SpamClassifier(BaseClassifier):
                 recall_score(y_val, y_pred, pos_label=self.spam_label, zero_division=0)
             ),
             "f1": float(f1_score(y_val, y_pred, pos_label=self.spam_label, zero_division=0)),
-            "train_samples": len(X_train),
-            "val_samples": len(X_val),
+            "train_samples": len(x_train),
+            "val_samples": len(x_val),
         }
 
         self.is_trained = True
@@ -279,6 +280,10 @@ class SpamClassifier(BaseClassifier):
         if self._pipeline is None:
             raise RuntimeError("Pipeline not initialized")
 
+        # Handle empty list
+        if not texts:
+            return []
+
         probas = self._pipeline.predict_proba(texts)
         classes = self._pipeline.classes_.tolist()
         spam_idx = classes.index(self.spam_label) if self.spam_label in classes else 0
@@ -323,8 +328,14 @@ class SpamClassifier(BaseClassifier):
 
         # Get feature importances (coefficients for spam class)
         if hasattr(clf, "coef_"):
-            spam_idx = list(clf.classes_).index(self.spam_label)
-            coef = clf.coef_[spam_idx] if len(clf.coef_.shape) > 1 else clf.coef_
+            # For binary classification, coef_ has shape (1, n_features) or (n_features,)
+            if len(clf.coef_.shape) > 1 and clf.coef_.shape[0] > 1:
+                # Multi-class: get spam class coefficients
+                spam_idx = list(clf.classes_).index(self.spam_label)
+                coef = clf.coef_[spam_idx]
+            else:
+                # Binary: use first (and only) coefficient array
+                coef = clf.coef_[0] if len(clf.coef_.shape) > 1 else clf.coef_
 
             # Get non-zero features in this text
             nonzero_indices = X.nonzero()[1]
