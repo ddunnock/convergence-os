@@ -67,6 +67,19 @@ addopts = """
     --cov-report=html
     """
 
+[tool.coverage.run]
+relative_files = true
+source = ["src"]
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.coverage.paths]
+source = [
+    "src/",
+    "*/services/ml/src/",
+]
+
 [tool.mypy]
 python_version = "3.12"
 namespace_packages = true

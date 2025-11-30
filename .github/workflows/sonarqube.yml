@@ -113,22 +113,31 @@ jobs:
         #   TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
       - name: Run Python tests with coverage
-        run: cd services/ml && poetry run pytest --cov=convergence_ml --cov-report=lcov --cov-report=term-missing
+        run: cd services/ml && poetry run pytest
         # TODO: Uncomment when database setup is complete
         # env:
         #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
         #   TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
         #   CONVERGENCE_ML_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
+      - name: Fix Python coverage paths for SonarQube
+        run: |
+          # Fix paths in coverage.xml to be relative to repository root
+          if [ -f services/ml/coverage.xml ]; then
+            # Replace filename="src/ with filename="services/ml/src/
+            sed -i 's|filename="src/|filename="services/ml/src/|g' services/ml/coverage.xml
+            echo "✅ Fixed Python coverage paths"
+          fi
+
       - name: Merge coverage reports
         run: |
           # Ensure coverage directory exists
           mkdir -p coverage
 
-          # Copy Python coverage if it exists
-          if [ -f services/ml/coverage.lcov ]; then
+          # Copy Python coverage XML if it exists
+          if [ -f services/ml/coverage.xml ]; then
             echo "Found Python coverage report"
-            cp services/ml/coverage.lcov coverage/python-coverage.lcov || true
+            cp services/ml/coverage.xml coverage/python-coverage.xml || true
           fi
 
           # Collect TypeScript coverage from all packages
@@ -160,8 +169,8 @@ jobs:
             echo "⚠️ TypeScript coverage empty or not found"
           fi
 
-          if [ -f coverage/python-coverage.lcov ]; then
-            echo "✅ Python coverage found: $(wc -c < coverage/python-coverage.lcov) bytes"
+          if [ -f coverage/python-coverage.xml ]; then
+            echo "✅ Python coverage found: $(wc -c < coverage/python-coverage.xml) bytes"
           else
             echo "⚠️ Python coverage not found"
           fi
@@ -187,7 +196,7 @@ jobs:
             -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/.next/**,**/coverage/**,**/__pycache__/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/test_*.py,**/*_test.py
             -Dsonar.test.inclusions=**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/test_*.py,**/*_test.py
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info,packages/ui/coverage/lcov.info,apps/web/coverage/lcov.info
-            -Dsonar.python.coverage.reportPaths=coverage/python-coverage.lcov,services/ml/coverage.lcov
+            -Dsonar.python.coverage.reportPaths=coverage/python-coverage.xml,services/ml/coverage.xml
             -Dsonar.sourceEncoding=UTF-8
 
       - name: Wait for Quality Gate
@@ -222,7 +231,7 @@ jobs:
           name: coverage-report
           path: |
             coverage/
-            services/ml/coverage.lcov
+            services/ml/coverage.xml
             .scannerwork/report-task.txt
           retention-days: 30
 
