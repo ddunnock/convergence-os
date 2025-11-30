@@ -1,0 +1,4 @@
+
+> @convergence/test-utils@0.1.0 typecheck /Users/dunnock/projects/convergence-os/packages/test-utils
+> tsc --noEmit
+

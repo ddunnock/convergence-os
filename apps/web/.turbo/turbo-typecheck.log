@@ -1,0 +1,4 @@
+
+> @convergence/web@0.1.0 typecheck /Users/dunnock/projects/convergence-os/apps/web
+> tsc --noEmit
+
