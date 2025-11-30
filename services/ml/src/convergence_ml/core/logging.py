@@ -105,7 +105,8 @@ def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
         >>> logger.warning("Rate limit approaching", current=95, max=100)
         >>> logger.error("Processing failed", error="Connection timeout")
     """
-    return structlog.get_logger(name)
+    logger: structlog.stdlib.BoundLogger = structlog.get_logger(name)
+    return logger
 
 
 def bind_context(**kwargs: object) -> None:
