@@ -86,7 +86,7 @@ jobs:
           path: ./services/ml/.venv
           key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
-        run: cd services/ml && poetry install --no-root
+        run: cd services/ml && poetry install
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
