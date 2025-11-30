@@ -1,5 +1,4 @@
-"""
-Entry point for the ConvergenceOS Machine Learning Services.
+"""Entry point for the ConvergenceOS Machine Learning Services.
 
 Usage:
     python -m convergence_ml

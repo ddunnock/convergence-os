@@ -1,6 +1,4 @@
-"""
-FastAPI application factory for the ConvergenceOS Machine Learning Services.
-"""
+"""FastAPI application factory for the ConvergenceOS Machine Learning Services."""
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -29,9 +27,8 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     )
 
     # Initialize ML models (lazy loading, but warm up here)
-    from convergence_ml.models.spacy_pipeline import get_spacy_model
-
     from convergence_ml.models.sentence_transformer import get_embedding_model
+    from convergence_ml.models.spacy_pipeline import get_spacy_model
 
     logger.info("Loading embedding model...")
     get_embedding_model()

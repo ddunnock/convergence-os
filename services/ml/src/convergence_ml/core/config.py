@@ -1,5 +1,4 @@
-"""
-Application configuration using Pydantic Settings.
+"""Application configuration using Pydantic Settings.
 
 Configuration is loaded from environment variables with optional .env support.
 """
@@ -59,6 +58,7 @@ class Settings(BaseSettings):
 
     @computed_field
     def is_development(self) -> bool:
+        """Check if running in development environment."""
         return self.environment == "development"
 
 

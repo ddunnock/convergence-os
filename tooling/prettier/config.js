@@ -1,11 +1,10 @@
-import jsdocPlugin from "prettier-plugin-jsdoc";
-
 /**
- * Prettier configuration with JSDoc plugin support
- * Compatible with TypeDoc for Sphinx documentation generation
+ * Prettier configuration with JSDoc plugin support Compatible with TypeDoc for
+ * Sphinx documentation generation
  */
 export default {
-  plugins: [jsdocPlugin],
+  // Reference plugin by package name (Prettier will resolve it)
+  plugins: ["prettier-plugin-jsdoc"],
   // JSDoc-specific options
   jsdocPrintWidth: 80,
   jsdocSeparateReturns: false,
@@ -24,4 +23,3 @@ export default {
   arrowParens: "always",
   endOfLine: "lf",
 };
-

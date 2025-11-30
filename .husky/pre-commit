@@ -1,1 +1,54 @@
-pnpm test
+#!/bin/sh
+
+# ConvergenceOS Pre-commit Hook
+# Runs linting and formatting checks before allowing commits
+
+# Run lint-staged for TypeScript/JavaScript files
+echo "🔍 Running lint-staged for TypeScript/JavaScript..."
+pnpm exec lint-staged
+
+# Check if any Python files are staged
+PYTHON_STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "^services/ml/.*\.py$" || true)
+
+if [ -n "$PYTHON_STAGED" ]; then
+    echo "🐍 Running Python linting for ML service..."
+
+    # Navigate to ML service directory
+    cd services/ml
+
+    # Run ruff linter
+    echo "  → Ruff linting..."
+    poetry run ruff check src tests --fix
+    if [ $? -ne 0 ]; then
+        echo "❌ Ruff linting failed. Please fix the errors above."
+        exit 1
+    fi
+
+    # Run ruff formatter (auto-fix)
+    echo "  → Ruff formatting..."
+    poetry run ruff format src tests
+    
+    # Return to root before re-adding files
+    cd ../..
+    
+    # Re-add formatted files to staging
+    git add $PYTHON_STAGED
+    
+    # Go back to ml directory for mypy
+    cd services/ml
+
+    # Run mypy type checking
+    echo "  → MyPy type checking..."
+    poetry run mypy src/convergence_ml --ignore-missing-imports
+    if [ $? -ne 0 ]; then
+        echo "❌ MyPy type checking failed. Please fix the type errors above."
+        exit 1
+    fi
+
+    # Return to root
+    cd ../..
+
+    echo "✅ Python linting passed!"
+fi
+
+echo "✅ All pre-commit checks passed!"
