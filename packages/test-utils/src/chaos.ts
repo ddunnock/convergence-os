@@ -1,7 +1,7 @@
 /**
- * @fileoverview Chaos testing utilities for stress testing React components.
- * Provides tools for fuzzing, race conditions, and failure simulation.
  * @module @convergence/test-utils/chaos
+ * @file Chaos testing utilities for stress testing React components. Provides
+ *   tools for fuzzing, race conditions, and failure simulation.
  */
 
 import { vi } from "vitest";
@@ -9,19 +9,19 @@ import { vi } from "vitest";
 /**
  * Executes a function rapidly multiple times.
  *
- * @description Useful for testing components under rapid state changes,
- * simulating user mashing buttons or rapid theme switching.
+ * Useful for testing components under rapid state changes, simulating user
+ * mashing buttons or rapid theme switching.
+ *
+ * @example
+ *   ```typescript
+ *   await rapidFire(() => setTheme('dark'), 1000, 0);
+ *   expect(renderCount).toBeLessThan(10); // Should batch updates
+ *   ```;
  *
  * @param fn - The function to execute
  * @param count - Number of times to execute (default: 1000)
  * @param intervalMs - Delay between executions in ms (default: 0)
  * @returns Promise that resolves when all executions complete
- *
- * @example
- * ```typescript
- * await rapidFire(() => setTheme('dark'), 1000, 0);
- * expect(renderCount).toBeLessThan(10); // Should batch updates
- * ```
  */
 export async function rapidFire(
   fn: () => void | Promise<void>,
@@ -45,19 +45,22 @@ export async function rapidFire(
 /**
  * Returns a promise that resolves after a random delay.
  *
- * @description Useful for simulating network latency or async operations
- * with unpredictable timing.
+ * Useful for simulating network latency or async operations with unpredictable
+ * timing.
+ *
+ * @example
+ *   ```typescript
+ *   await randomDelay(10, 100);
+ *   ```;
  *
  * @param minMs - Minimum delay in milliseconds
  * @param maxMs - Maximum delay in milliseconds
  * @returns Promise that resolves after the random delay
- *
- * @example
- * ```typescript
- * await randomDelay(10, 100);
- * ```
+ * @security Math.random() is safe here as this is only used for testing/simulation,
+ * not for cryptographic purposes or security-sensitive operations.
  */
 export function randomDelay(minMs: number, maxMs: number): Promise<void> {
+  // SECURITY: Math.random() is appropriate for test simulation purposes
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
@@ -65,19 +68,19 @@ export function randomDelay(minMs: number, maxMs: number): Promise<void> {
 /**
  * Creates a large DOM tree to simulate memory pressure.
  *
- * @description Useful for testing component behavior under memory-constrained
- * conditions, such as theme switching with a complex DOM.
+ * Useful for testing component behavior under memory-constrained conditions,
+ * such as theme switching with a complex DOM.
+ *
+ * @example
+ *   ```typescript
+ *   const cleanup = simulateMemoryPressure(50000);
+ *   // Run your tests
+ *   await switchTheme();
+ *   cleanup();
+ *   ```;
  *
  * @param nodeCount - Number of nodes to create (default: 10000)
  * @returns Cleanup function to remove the created nodes
- *
- * @example
- * ```typescript
- * const cleanup = simulateMemoryPressure(50000);
- * // Run your tests
- * await switchTheme();
- * cleanup();
- * ```
  */
 export function simulateMemoryPressure(nodeCount = 10000): () => void {
   const container = document.createElement("div");
@@ -88,7 +91,7 @@ export function simulateMemoryPressure(nodeCount = 10000): () => void {
     const node = document.createElement("div");
     node.className = `pressure-node-${i}`;
     node.textContent = `Node ${i}`;
-    node.setAttribute("data-index", String(i));
+    node.dataset.index = String(i);
     container.appendChild(node);
   }
 
@@ -102,16 +105,16 @@ export function simulateMemoryPressure(nodeCount = 10000): () => void {
 /**
  * Corrupts localStorage data for a specific key.
  *
- * @description Tests how components handle invalid or corrupted stored data.
+ * Tests how components handle invalid or corrupted stored data.
+ *
+ * @example
+ *   ```typescript
+ *   corruptLocalStorage('theme-variant', 'invalid-json');
+ *   // Component should gracefully fall back to default
+ *   ```;
  *
  * @param key - The localStorage key to corrupt
  * @param corruptionType - Type of corruption to apply
- *
- * @example
- * ```typescript
- * corruptLocalStorage('theme-variant', 'invalid-json');
- * // Component should gracefully fall back to default
- * ```
  */
 export function corruptLocalStorage(
   key: string,
@@ -139,17 +142,17 @@ export function corruptLocalStorage(
 /**
  * Creates a mock that simulates storage quota exceeded errors.
  *
- * @description Tests graceful handling of storage full scenarios.
- *
- * @returns Object with enable/disable controls
+ * Tests graceful handling of storage full scenarios.
  *
  * @example
- * ```typescript
- * const quota = simulateStorageQuotaExceeded();
- * quota.enable();
- * expect(() => localStorage.setItem('key', 'value')).toThrow();
- * quota.disable();
- * ```
+ *   ```typescript
+ *   const quota = simulateStorageQuotaExceeded();
+ *   quota.enable();
+ *   expect(() => localStorage.setItem('key', 'value')).toThrow();
+ *   quota.disable();
+ *   ```;
+ *
+ * @returns Object with enable/disable controls
  */
 export function simulateStorageQuotaExceeded(): {
   enable: () => void;
@@ -180,22 +183,31 @@ export function simulateStorageQuotaExceeded(): {
 }
 
 /**
+ * Generator function for fuzzing values.
+ *
+ * @private
+ */
+function* generatorForFuzzing() {
+  yield 1;
+}
+
+/**
  * Generates random invalid values for fuzzing.
  *
- * @description Creates an array of random/invalid values to test
- * component robustness against unexpected inputs.
+ * Creates an array of random/invalid values to test component robustness
+ * against unexpected inputs.
+ *
+ * @example
+ *   ```typescript
+ *   const fuzzed = fuzzer(['light', 'dark', 'system'], 100);
+ *   for (const value of fuzzed) {
+ *     setTheme(value); // Should not crash
+ *   }
+ *   ```;
  *
  * @param validValues - Array of valid values to base fuzzing on
  * @param count - Number of fuzzed values to generate (default: 50)
  * @returns Array of fuzzed values
- *
- * @example
- * ```typescript
- * const fuzzed = fuzzer(['light', 'dark', 'system'], 100);
- * for (const value of fuzzed) {
- *   setTheme(value); // Should not crash
- * }
- * ```
  */
 export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
   const fuzzedValues: unknown[] = [];
@@ -233,7 +245,9 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
         ? validValues[0].toUpperCase()
         : validValues[0],
     () =>
-      typeof validValues[0] === "string" ? ` ${validValues[0]} ` : validValues[0],
+      typeof validValues[0] === "string"
+        ? ` ${validValues[0]} `
+        : validValues[0],
     () =>
       typeof validValues[0] === "string"
         ? validValues[0] + "\x00"
@@ -248,10 +262,7 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
     () => new WeakSet(),
     // Functions
     () => () => {},
-    () =>
-      function* () {
-        yield 1;
-      },
+    () => generatorForFuzzing,
     () => async () => {},
     // Proxy/prototype pollution attempts
     () => ({ __proto__: { polluted: true } }),
@@ -268,6 +279,7 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
   ];
 
   for (let i = 0; i < count; i++) {
+    // SECURITY: Math.random() is appropriate for fuzzing/testing purposes
     const randomIndex = Math.floor(Math.random() * generators.length);
     const generator = generators[randomIndex];
     if (generator) {
@@ -281,25 +293,25 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
 /**
  * Tests for race conditions in mount/unmount cycles.
  *
- * @description Rapidly mounts and unmounts components to detect race conditions
- * in cleanup logic or async operations.
+ * Rapidly mounts and unmounts components to detect race conditions in cleanup
+ * logic or async operations.
+ *
+ * @example
+ *   ```typescript
+ *   await raceConditionTester(
+ *     () => {
+ *       const { unmount } = render(<ThemeProvider><App /></ThemeProvider>);
+ *       return unmount;
+ *     },
+ *     100,
+ *     { maxConcurrent: 5 }
+ *   );
+ *   ```;
  *
  * @param setup - Function to mount the component, returns cleanup function
  * @param iterations - Number of mount/unmount cycles (default: 100)
  * @param options - Additional options
  * @returns Promise that resolves when testing is complete
- *
- * @example
- * ```typescript
- * await raceConditionTester(
- *   () => {
- *     const { unmount } = render(<ThemeProvider><App /></ThemeProvider>);
- *     return unmount;
- *   },
- *   100,
- *   { maxConcurrent: 5 }
- * );
- * ```
  */
 export async function raceConditionTester(
   setup: () => (() => void) | Promise<() => void>,
@@ -310,7 +322,11 @@ export async function raceConditionTester(
     randomDelay?: boolean;
   } = {}
 ): Promise<void> {
-  const { maxConcurrent = 10, delayBetween = 0, randomDelay: useRandomDelay = false } = options;
+  const {
+    maxConcurrent = 10,
+    delayBetween = 0,
+    randomDelay: useRandomDelay = false,
+  } = options;
 
   const running: Promise<void>[] = [];
 
@@ -338,9 +354,7 @@ export async function raceConditionTester(
   await Promise.all(running);
 }
 
-/**
- * Configuration for network failure simulation.
- */
+/** Configuration for network failure simulation. */
 export interface NetworkFailureOptions {
   /** Probability of failure (0-1) */
   failureProbability?: number;
@@ -353,35 +367,47 @@ export interface NetworkFailureOptions {
 /**
  * Mocks fetch to simulate network failures for specific URL patterns.
  *
- * @description Tests component behavior when CSS or other resources fail to load.
+ * Tests component behavior when CSS or other resources fail to load.
+ *
+ * @example
+ *   ```typescript
+ *   const restore = networkFailure(/\.css$/, {
+ *     failureProbability: 0.5,
+ *     errorType: 'network'
+ *   });
+ *   // Test theme CSS loading with intermittent failures
+ *   restore();
+ *   ```;
  *
  * @param urlPattern - Regex or string pattern to match URLs
  * @param options - Failure configuration
  * @returns Cleanup function to restore original fetch
- *
- * @example
- * ```typescript
- * const restore = networkFailure(/\.css$/, {
- *   failureProbability: 0.5,
- *   errorType: 'network'
- * });
- * // Test theme CSS loading with intermittent failures
- * restore();
- * ```
  */
 export function networkFailure(
   urlPattern: RegExp | string,
   options: NetworkFailureOptions = {}
 ): () => void {
-  const { failureProbability = 1, delayMs = 0, errorType = "network" } = options;
+  const {
+    failureProbability = 1,
+    delayMs = 0,
+    errorType = "network",
+  } = options;
 
   const originalFetch = global.fetch;
   const pattern =
     typeof urlPattern === "string" ? new RegExp(urlPattern) : urlPattern;
 
   global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+    let url: string;
+    if (typeof input === "string") {
+      url = input;
+    } else if (input instanceof URL) {
+      url = input.toString();
+    } else {
+      url = input.url;
+    }
 
+    // SECURITY: Math.random() is appropriate for test simulation purposes
     if (pattern.test(url) && Math.random() < failureProbability) {
       if (delayMs > 0) {
         await new Promise((resolve) => setTimeout(resolve, delayMs));
@@ -408,18 +434,18 @@ export function networkFailure(
 /**
  * Simulates concurrent access from multiple "tabs".
  *
- * @description Tests storage event handling and synchronization between
- * simulated browser tabs.
- *
- * @param key - localStorage key to access
- * @param values - Values to write from different "tabs"
- * @param intervalMs - Interval between writes (default: 0)
+ * Tests storage event handling and synchronization between simulated browser
+ * tabs.
  *
  * @example
- * ```typescript
- * await simulateConcurrentTabs('theme', ['dark', 'light', 'system']);
- * // Component should handle storage events correctly
- * ```
+ *   ```typescript
+ *   await simulateConcurrentTabs('theme', ['dark', 'light', 'system']);
+ *   // Component should handle storage events correctly
+ *   ```;
+ *
+ * @param key - LocalStorage key to access
+ * @param values - Values to write from different "tabs"
+ * @param intervalMs - Interval between writes (default: 0)
  */
 export async function simulateConcurrentTabs(
   key: string,
@@ -451,17 +477,17 @@ export async function simulateConcurrentTabs(
 /**
  * Measures render performance during operations.
  *
- * @description Tracks render counts and timing to detect performance regressions.
- *
- * @returns Object with tracking functions
+ * Tracks render counts and timing to detect performance regressions.
  *
  * @example
- * ```typescript
- * const perf = createPerformanceTracker();
- * const { rerender } = render(<Component onRender={perf.onRender} />);
- * await switchTheme();
- * expect(perf.getRenderCount()).toBeLessThan(5);
- * ```
+ *   ```typescript
+ *   const perf = createPerformanceTracker();
+ *   const { rerender } = render(<Component onRender={perf.onRender} />);
+ *   await switchTheme();
+ *   expect(perf.getRenderCount()).toBeLessThan(5);
+ *   ```;
+ *
+ * @returns Object with tracking functions
  */
 export function createPerformanceTracker(): {
   onRender: () => void;

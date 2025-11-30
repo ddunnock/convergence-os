@@ -1,7 +1,8 @@
 /**
- * @fileoverview Theme provider component for managing theme variants and color modes.
- * Combines a custom theme variant system with next-themes for light/dark mode support.
  * @module @convergence/ui/providers/theme-provider
+ * @file Theme provider component for managing theme variants and color modes.
+ *   Combines a custom theme variant system with next-themes for light/dark mode
+ *   support.
  */
 
 "use client";
@@ -15,40 +16,44 @@ import {
   useContext,
   useEffect,
   useCallback,
+  useMemo,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
 
 /**
  * Available theme variants for the application.
- * @description Each variant corresponds to a CSS file in /public/themes/
+ *
+ * Each variant corresponds to a CSS file in /public/themes/
  *
  * @example
- * ```typescript
- * const variant: ThemeVariant = "convergence";
- * ```
+ *   ```typescript
+ *   const variant: ThemeVariant = "convergence";
+ *   ```;
  */
 export type ThemeVariant = "convergence" | "synthwave";
 
 /**
  * Available color modes for the application.
- * @description "system" follows the user's OS preference
+ *
+ * System follows the user's OS preference
  *
  * @example
- * ```typescript
- * const mode: ColorMode = "dark";
- * ```
+ *   ```typescript
+ *   const mode: ColorMode = "dark";
+ *   ```;
  */
 export type ColorMode = "light" | "dark" | "system";
 
 /**
  * Context value provided by ThemeProvider.
- * @description Contains all theme state and setter functions
+ *
+ * Contains all theme state and setter functions
  *
  * @example
- * ```typescript
- * const { themeVariant, setThemeVariant, colorMode, mounted } = useTheme();
- * ```
+ *   ```typescript
+ *   const { themeVariant, setThemeVariant, colorMode, mounted } = useTheme();
+ *   ```;
  */
 export interface ThemeContextValue {
   /** Current theme variant (convergence, synthwave) */
@@ -67,32 +72,37 @@ export interface ThemeContextValue {
 
 /**
  * React context for theme values.
+ *
  * @internal
  */
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 /**
- * localStorage key for persisting theme variant.
+ * LocalStorage key for persisting theme variant.
+ *
  * @internal
  */
 export const THEME_VARIANT_KEY = "convergence-theme-variant";
 
 /**
  * Subscription listeners for theme variant changes.
+ *
  * @internal
  */
 let themeVariantListeners: Array<() => void> = [];
 
 /**
  * Current theme variant value.
+ *
  * @internal
  */
 let currentThemeVariant: ThemeVariant = "convergence";
 
 /**
  * Gets the current theme variant for useSyncExternalStore.
- * @internal
+ *
  * @returns The current theme variant
+ * @internal
  */
 function getThemeVariantSnapshot(): ThemeVariant {
   return currentThemeVariant;
@@ -100,9 +110,10 @@ function getThemeVariantSnapshot(): ThemeVariant {
 
 /**
  * Subscribes to theme variant changes for useSyncExternalStore.
- * @internal
+ *
  * @param callback - Function to call when theme variant changes
  * @returns Unsubscribe function
+ * @internal
  */
 function subscribeToThemeVariant(callback: () => void): () => void {
   themeVariantListeners.push(callback);
@@ -113,8 +124,9 @@ function subscribeToThemeVariant(callback: () => void): () => void {
 
 /**
  * Sets the theme variant and notifies all subscribers.
- * @internal
+ *
  * @param variant - The new theme variant to set
+ * @internal
  */
 function setThemeVariantInternal(variant: ThemeVariant): void {
   currentThemeVariant = variant;
@@ -130,6 +142,7 @@ function setThemeVariantInternal(variant: ThemeVariant): void {
 
 /**
  * Validates if a value is a valid theme variant.
+ *
  * @param value - Value to check
  * @returns True if value is a valid ThemeVariant
  */
@@ -151,20 +164,23 @@ if (typeof window !== "undefined") {
 
 /**
  * Subscription listeners for mounted state changes.
+ *
  * @internal
  */
 let mountedListeners: Array<() => void> = [];
 
 /**
  * Whether the application has mounted on the client.
+ *
  * @internal
  */
 let isMounted = false;
 
 /**
  * Gets the mounted state for useSyncExternalStore (client).
- * @internal
+ *
  * @returns Whether the app is mounted
+ * @internal
  */
 function getMountedSnapshot(): boolean {
   return isMounted;
@@ -172,8 +188,9 @@ function getMountedSnapshot(): boolean {
 
 /**
  * Gets the mounted state for useSyncExternalStore (server).
- * @internal
+ *
  * @returns Always false on server
+ * @internal
  */
 function getMountedServerSnapshot(): boolean {
   return false;
@@ -181,9 +198,10 @@ function getMountedServerSnapshot(): boolean {
 
 /**
  * Subscribes to mounted state changes for useSyncExternalStore.
- * @internal
+ *
  * @param callback - Function to call when mounted state changes
  * @returns Unsubscribe function
+ * @internal
  */
 function subscribeToMounted(callback: () => void): () => void {
   mountedListeners.push(callback);
@@ -203,11 +221,12 @@ if (typeof window !== "undefined") {
 
 /**
  * Internal provider component that manages theme variant state.
- * @internal
+ *
  * @param props - Component props
  * @param props.children - Child components
  * @param props.defaultVariant - Default theme variant for SSR
  * @returns Theme variant context provider with children
+ * @internal
  */
 function ThemeVariantProvider({
   children,
@@ -265,14 +284,17 @@ function ThemeVariantProvider({
     [setTheme]
   );
 
-  const value: ThemeContextValue = {
-    themeVariant,
-    setThemeVariant,
-    colorMode: (theme as ColorMode) ?? "system",
-    setColorMode,
-    resolvedColorMode: (resolvedTheme as "light" | "dark") ?? "light",
-    mounted,
-  };
+  const value: ThemeContextValue = useMemo(
+    () => ({
+      themeVariant,
+      setThemeVariant,
+      colorMode: (theme as ColorMode) ?? "system",
+      setColorMode,
+      resolvedColorMode: (resolvedTheme as "light" | "dark") ?? "light",
+      mounted,
+    }),
+    [themeVariant, setThemeVariant, theme, setColorMode, resolvedTheme, mounted]
+  );
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
@@ -281,6 +303,7 @@ function ThemeVariantProvider({
 
 /**
  * Props for the ThemeProvider component.
+ *
  * @see ThemeProvider
  */
 export interface ThemeProviderProps {
@@ -297,31 +320,31 @@ export interface ThemeProviderProps {
 /**
  * Theme provider component that manages theme variants and color modes.
  *
- * @description Wraps the application to provide theme context. Combines a custom
- * theme variant system (convergence/synthwave) with next-themes for light/dark mode.
+ * Wraps the application to provide theme context. Combines a custom theme
+ * variant system (convergence/synthwave) with next-themes for light/dark mode.
  * Persists theme preference to localStorage and loads theme CSS dynamically.
+ *
+ * @example
+ *   ```tsx
+ *   // In your layout or app root
+ *   <ThemeProvider defaultVariant="convergence" defaultColorMode="system">
+ *     <App />
+ *   </ThemeProvider>
+ *   ```;
+ *
+ * @example
+ *   ```tsx
+ *   // In a child component
+ *   const { themeVariant, setThemeVariant } = useTheme();
+ *   ```;
  *
  * @param props - Component props
  * @param props.children - Child components to wrap with theme context
  * @param props.defaultVariant - Default theme variant (default: "convergence")
  * @param props.defaultColorMode - Default color mode (default: "system")
- * @param props.disableTransitionOnChange - Disable CSS transitions during theme changes (default: true)
+ * @param props.disableTransitionOnChange - Disable CSS transitions during theme
+ *   changes (default: true)
  * @returns Provider component wrapping children
- *
- * @example
- * ```tsx
- * // In your layout or app root
- * <ThemeProvider defaultVariant="convergence" defaultColorMode="system">
- *   <App />
- * </ThemeProvider>
- * ```
- *
- * @example
- * ```tsx
- * // In a child component
- * const { themeVariant, setThemeVariant } = useTheme();
- * ```
- *
  * @see useTheme
  * @see ThemeProviderProps
  */
@@ -348,29 +371,28 @@ export function ThemeProvider({
 /**
  * Hook to access the theme context.
  *
- * @description Provides access to theme state and setter functions.
- * Must be used within a ThemeProvider.
+ * Provides access to theme state and setter functions. Must be used within a
+ * ThemeProvider.
+ *
+ * @example
+ *   ```tsx
+ *   function ThemeToggle() {
+ *     const { themeVariant, setThemeVariant, mounted } = useTheme();
+ *
+ *     if (!mounted) return <Skeleton />;
+ *
+ *     return (
+ *       <button onClick={() => setThemeVariant(
+ *         themeVariant === 'convergence' ? 'synthwave' : 'convergence'
+ *       )}>
+ *         Current: {themeVariant}
+ *       </button>
+ *     );
+ *   }
+ *   ```;
  *
  * @returns Theme context value with current state and setters
  * @throws {Error} If used outside of ThemeProvider
- *
- * @example
- * ```tsx
- * function ThemeToggle() {
- *   const { themeVariant, setThemeVariant, mounted } = useTheme();
- *
- *   if (!mounted) return <Skeleton />;
- *
- *   return (
- *     <button onClick={() => setThemeVariant(
- *       themeVariant === 'convergence' ? 'synthwave' : 'convergence'
- *     )}>
- *       Current: {themeVariant}
- *     </button>
- *   );
- * }
- * ```
- *
  * @see ThemeProvider
  * @see ThemeContextValue
  */
@@ -384,10 +406,13 @@ export function useTheme(): ThemeContextValue {
 
 /**
  * Resets the theme state for testing purposes.
- * @internal
+ *
  * @param defaultVariant - Default variant to reset to
+ * @internal
  */
-export function resetThemeState(defaultVariant: ThemeVariant = "convergence"): void {
+export function resetThemeState(
+  defaultVariant: ThemeVariant = "convergence"
+): void {
   currentThemeVariant = defaultVariant;
   isMounted = false;
   themeVariantListeners = [];

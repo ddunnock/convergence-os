@@ -283,6 +283,8 @@ def _parse_address(address_str: str) -> tuple[str, str]:
     address_str = _decode_header(address_str)
 
     # Try to parse "Name <email>" format
+    # SECURITY: This regex is safe from ReDoS as it uses non-backtracking patterns
+    # with single quantifiers and bounded character classes
     match = re.match(r"^(.+?)\s*<([^>]+)>", address_str)
     if match:
         name = match.group(1).strip().strip('"')

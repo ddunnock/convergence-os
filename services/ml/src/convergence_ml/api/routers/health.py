@@ -12,7 +12,6 @@ Example:
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING
 
 from fastapi import APIRouter
 
@@ -24,9 +23,6 @@ from convergence_ml.api.deps import (
 )
 from convergence_ml.core.logging import get_logger
 from convergence_ml.schemas.common import HealthResponse
-
-if TYPE_CHECKING:
-    pass
 
 logger = get_logger(__name__)
 

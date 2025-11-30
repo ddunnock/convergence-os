@@ -19,16 +19,12 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from convergence_ml.core.config import get_settings
 from convergence_ml.core.logging import get_logger
-
-if TYPE_CHECKING:
-    pass
 
 logger = get_logger(__name__)
 

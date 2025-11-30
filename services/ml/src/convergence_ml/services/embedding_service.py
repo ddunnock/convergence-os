@@ -240,80 +240,20 @@ class EmbeddingService:
         skipped = 0
 
         # Prepare batch data
-        to_embed: list[tuple[str, str, dict[str, object] | None]] = []
-        content_hashes: dict[str, str] = {}
-
-        for doc_id, content, metadata in documents:
-            content_hash = self._compute_hash(content)
-            content_hashes[doc_id] = content_hash
-
-            if skip_if_unchanged:
-                existing = await self.vector_store.get_embedding(doc_id)
-                if existing:
-                    _, existing_meta = existing
-                    if existing_meta.get("content_hash") == content_hash:
-                        skipped += 1
-                        results.append(
-                            EmbeddingResult(
-                                document_id=doc_id,
-                                embedding=existing[0],
-                                content_hash=content_hash,
-                                dimension=len(existing[0]),
-                                metadata=existing_meta,
-                            )
-                        )
-                        continue
-
-            to_embed.append((doc_id, content, metadata))
+        to_embed, content_hashes = await self._prepare_batch_documents(
+            documents, skip_if_unchanged, results
+        )
+        skipped = len(results)
 
         # Batch embed all new/changed documents
         if to_embed:
-            try:
-                texts = [content for _, content, _ in to_embed]
-                embeddings = self.embedding_generator.embed(texts)
-
-                for i, (doc_id, _content, metadata) in enumerate(to_embed):
-                    try:
-                        embedding = embeddings[i].tolist()
-                        content_hash = content_hashes[doc_id]
-
-                        full_metadata = {
-                            "content_hash": content_hash,
-                            **(metadata or {}),
-                        }
-
-                        await self.vector_store.add_embedding(
-                            document_id=doc_id,
-                            embedding=embedding,
-                            metadata=full_metadata,
-                        )
-
-                        results.append(
-                            EmbeddingResult(
-                                document_id=doc_id,
-                                embedding=embedding,
-                                content_hash=content_hash,
-                                dimension=len(embedding),
-                                metadata=full_metadata,
-                            )
-                        )
-                    except Exception as e:
-                        errors.append(
-                            {
-                                "document_id": doc_id,
-                                "error": str(e),
-                            }
-                        )
-            except Exception as e:
-                logger.error("Batch embedding failed", error=str(e))
-                errors.append({"batch_error": str(e)})
+            await self._process_batch_embeddings(to_embed, content_hashes, results, errors)
 
         successful = len(results) - skipped
         failed = len(errors)
 
         logger.info(
             "Batch embedding complete",
-            total=len(documents),
             successful=successful,
             skipped=skipped,
             failed=failed,
@@ -325,7 +265,151 @@ class EmbeddingService:
             failed=failed,
             skipped=skipped,
             results=results,
-            errors=errors,
+            errors=errors or [],
+        )
+
+    async def _prepare_batch_documents(
+        self,
+        documents: Sequence[tuple[str, str, dict[str, object] | None]],
+        skip_if_unchanged: bool,
+        results: list[EmbeddingResult],
+    ) -> tuple[list[tuple[str, str, dict[str, object] | None]], dict[str, str]]:
+        """Prepare documents for batch embedding, checking for unchanged content.
+
+        Args:
+            documents: List of (document_id, content, metadata) tuples.
+            skip_if_unchanged: Whether to skip unchanged documents.
+            results: List to append skipped document results to.
+
+        Returns:
+            Tuple of (documents_to_embed, content_hashes).
+        """
+        to_embed: list[tuple[str, str, dict[str, object] | None]] = []
+        content_hashes: dict[str, str] = {}
+
+        for doc_id, content, metadata in documents:
+            content_hash = self._compute_hash(content)
+            content_hashes[doc_id] = content_hash
+
+            if skip_if_unchanged:
+                existing = await self.vector_store.get_embedding(doc_id)
+                if existing and self._is_unchanged(existing, content_hash):
+                    results.append(
+                        self._create_embedding_result(
+                            doc_id, existing[0], content_hash, existing[1]
+                        )
+                    )
+                    continue
+
+            to_embed.append((doc_id, content, metadata))
+
+        return to_embed, content_hashes
+
+    def _is_unchanged(
+        self,
+        existing: tuple[list[float], dict[str, object]],
+        content_hash: str,
+    ) -> bool:
+        """Check if document content is unchanged.
+
+        Args:
+            existing: Existing embedding and metadata.
+            content_hash: New content hash to compare.
+
+        Returns:
+            True if content is unchanged.
+        """
+        _, existing_meta = existing
+        return existing_meta.get("content_hash") == content_hash
+
+    def _create_embedding_result(
+        self,
+        doc_id: str,
+        embedding: list[float],
+        content_hash: str,
+        metadata: dict[str, object],
+    ) -> EmbeddingResult:
+        """Create an EmbeddingResult object.
+
+        Args:
+            doc_id: Document identifier.
+            embedding: Embedding vector.
+            content_hash: Content hash.
+            metadata: Document metadata.
+
+        Returns:
+            EmbeddingResult object.
+        """
+        return EmbeddingResult(
+            document_id=doc_id,
+            embedding=embedding,
+            content_hash=content_hash,
+            dimension=len(embedding),
+            metadata=metadata,
+        )
+
+    async def _process_batch_embeddings(
+        self,
+        to_embed: list[tuple[str, str, dict[str, object] | None]],
+        content_hashes: dict[str, str],
+        results: list[EmbeddingResult],
+        errors: list[dict[str, str]],
+    ) -> None:
+        """Process batch embeddings and store results.
+
+        Args:
+            to_embed: List of documents to embed.
+            content_hashes: Mapping of document IDs to content hashes.
+            results: List to append successful results to.
+            errors: List to append errors to.
+        """
+        try:
+            texts = [content for _, content, _ in to_embed]
+            embeddings = self.embedding_generator.embed(texts)
+
+            for i, (doc_id, _content, metadata) in enumerate(to_embed):
+                try:
+                    await self._store_single_embedding(
+                        doc_id, embeddings[i], content_hashes[doc_id], metadata, results
+                    )
+                except Exception as e:
+                    errors.append({"document_id": doc_id, "error": str(e)})
+        except Exception as e:
+            logger.error("Batch embedding failed", error=str(e))
+            errors.append({"batch_error": str(e)})
+
+    async def _store_single_embedding(
+        self,
+        doc_id: str,
+        embedding_array: object,
+        content_hash: str,
+        metadata: dict[str, object] | None,
+        results: list[EmbeddingResult],
+    ) -> None:
+        """Store a single embedding and add result.
+
+        Args:
+            doc_id: Document identifier.
+            embedding_array: Embedding array from model.
+            content_hash: Content hash.
+            metadata: Document metadata.
+            results: List to append result to.
+        """
+        # Type: ignore needed because numpy array types are complex
+        embedding = embedding_array.tolist()  # type: ignore[attr-defined]
+        full_metadata = {
+            "content_hash": content_hash,
+            **(metadata or {}),
+        }
+
+        await self.vector_store.add_embedding(
+            document_id=doc_id,
+            embedding=embedding,
+            metadata=full_metadata,
+        )
+
+        results.append(
+            self._create_embedding_result(doc_id, embedding, content_hash, full_metadata)
         )
 
     async def search(

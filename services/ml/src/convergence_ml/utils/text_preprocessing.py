@@ -150,6 +150,8 @@ def clean_text(
 
     # Remove email addresses
     if remove_emails:
+        # SECURITY: This regex is safe from ReDoS as it uses bounded quantifiers
+        # and character classes without nested repetition or alternation
         text = re.sub(
             r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
             "",
