@@ -49,7 +49,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.12'],
+        python-version: ['3.12']
         poetry-version: ['2.0.0']
 
     steps:
