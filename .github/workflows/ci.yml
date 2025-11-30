@@ -24,16 +24,16 @@ on:
     branches:
       - main
       - develop
-      - 'feature/**'
+      - "feature/**"
     paths-ignore:
-      - 'docs/**'
-      - '**.md'
-      - 'LICENSE'
+      - "docs/**"
+      - "**.md"
+      - "LICENSE"
   pull_request:
     branches:
       - main
       - develop
-  workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch: # Allow manual triggers
 
 # Cancel in-progress runs when a new push occurs
 concurrency:
@@ -49,8 +49,8 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.12']
-        poetry-version: ['2.0.0']
+        python-version: ["3.12"]
+        poetry-version: ["2.0.0"]
 
     steps:
       - name: Checkout code
@@ -65,7 +65,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-    
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -75,16 +75,16 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
@@ -113,14 +113,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -130,8 +130,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -182,7 +182,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Need full history to compare with base branch
+          fetch-depth: 0 # Need full history to compare with base branch
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -192,14 +192,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -209,8 +209,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -237,27 +237,27 @@ jobs:
         run: |
           # Get the base branch (main or develop)
           BASE_BRANCH="${GITHUB_BASE_REF:-main}"
-          
+
           # Get changed TypeScript/JavaScript files
           CHANGED_TS_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.(ts|tsx|js|jsx)$' | grep -v '\.test\.' | grep -v '\.spec\.' || echo "")
-          
+
           # Get changed Python files
           CHANGED_PY_FILES=$(git diff --name-only origin/$BASE_BRANCH...HEAD | grep -E '\.py$' | grep -v 'test_' | grep -v '__pycache__' || echo "")
-          
+
           echo "Changed TypeScript files:"
           echo "$CHANGED_TS_FILES"
           echo "Changed Python files:"
           echo "$CHANGED_PY_FILES"
-          
+
           # Save for next step
           echo "ts_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED_TS_FILES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          
+
           echo "py_files<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGED_PY_FILES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-          
+
           # Check if there are any changed files
           if [ -z "$CHANGED_TS_FILES" ] && [ -z "$CHANGED_PY_FILES" ]; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
@@ -269,13 +269,13 @@ jobs:
         if: steps.changed-files.outputs.has_changes == 'true'
         run: |
           echo "📊 Running tests with coverage for changed files..."
-          
+
           # Run TypeScript tests if there are TS changes
           if [ -n "${{ steps.changed-files.outputs.ts_files }}" ]; then
             echo "Running TypeScript tests..."
-            pnpm test --run --coverage || true
+            pnpm test:coverage || true
           fi
-          
+
           # Run Python tests if there are Python changes
           if [ -n "${{ steps.changed-files.outputs.py_files }}" ]; then
             echo "Running Python tests..."
@@ -339,14 +339,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -356,8 +356,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -378,9 +378,8 @@ jobs:
       #   run: pnpm --filter @convergence/db db:migrate || true
       #   env:
       #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
-
       - name: Run TypeScript tests
-        run: pnpm test --run --coverage
+        run: pnpm test:coverage
         # TODO: Uncomment when database setup is complete
         # env:
         #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
@@ -476,14 +475,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -493,8 +492,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -532,14 +531,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -549,8 +548,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -562,7 +561,6 @@ jobs:
       #   run: pnpm --filter @convergence/db build
       #   env:
       #     DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/convergence_test' }}
-
       - name: Build all packages and apps
         run: pnpm build
         # TODO: Uncomment when database setup is complete
@@ -600,13 +598,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
@@ -617,8 +615,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 

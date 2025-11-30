@@ -66,14 +66,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '25'
-          cache: 'pnpm'
+          node-version: "25"
+          cache: "pnpm"
 
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-    
+          python-version: "3.12"
+
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
       - name: Setup a local virtual environment (if no poetry.toml file)
@@ -83,8 +83,8 @@ jobs:
       - uses: actions/cache@v4
         name: Define a cache for the virtual environment based on the dependencies lock file
         with:
-            path: ./services/ml/.venv
-            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+          path: ./services/ml/.venv
+          key: venv-${{ hashFiles('services/ml/poetry.lock') }}
       - name: Install project dependencies
         run: cd services/ml && poetry install --no-root
 
@@ -105,9 +105,8 @@ jobs:
       #   run: pnpm --filter @convergence/db db:migrate || true
       #   env:
       #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
-
       - name: Run TypeScript tests with coverage
-        run: pnpm test --run --coverage
+        run: pnpm test:coverage
         # TODO: Uncomment when database setup is complete
         # env:
         #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
@@ -125,13 +124,13 @@ jobs:
         run: |
           # Ensure coverage directory exists
           mkdir -p coverage
-          
+
           # Copy Python coverage if it exists
           if [ -f services/ml/coverage.lcov ]; then
             echo "Found Python coverage report"
             cp services/ml/coverage.lcov coverage/python-coverage.lcov || true
           fi
-          
+
           # TypeScript coverage should already be in coverage/lcov.info
           if [ -f coverage/lcov.info ]; then
             echo "Found TypeScript coverage report"
