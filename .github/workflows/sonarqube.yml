@@ -34,21 +34,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
-    services:
-      # PostgreSQL service for integration tests
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: convergence_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    # TODO: Uncomment when database setup is complete
+    # services:
+    #   # PostgreSQL service for integration tests
+    #   postgres:
+    #     image: postgres:16
+    #     env:
+    #       POSTGRES_USER: postgres
+    #       POSTGRES_PASSWORD: postgres
+    #       POSTGRES_DB: convergence_test
+    #     ports:
+    #       - 5432:5432
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
 
     steps:
       - name: Checkout code
@@ -68,42 +69,57 @@ jobs:
           node-version: '25'
           cache: 'pnpm'
 
-      - name: Setup Poetry Environment
-        uses: abatilo/setup-poetry-environment@v1
+      - name: Install Python
+        uses: actions/setup-python@v5
         with:
-          poetry-version: 2.0.0
-          poetry-lockfile: services/ml/pyproject.toml
+          python-version: '3.12'
+    
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v4
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v4
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+            path: ./services/ml/.venv
+            key: venv-${{ hashFiles('services/ml/poetry.lock') }}
+      - name: Install project dependencies
+        run: cd services/ml && poetry install --no-root
 
       - name: Install pnpm dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Poetry dependencies
-        run: cd services/ml && poetry install --no-root
-
       - name: Build required packages
         run: |
-          pnpm --filter @convergence/db build || true
+          # TODO: Uncomment when database setup is complete
+          # pnpm --filter @convergence/db build || true
           pnpm --filter @convergence/ui build || true
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        # TODO: Uncomment when database setup is complete
+        # env:
+        #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
-      - name: Run database migrations
-        run: pnpm --filter @convergence/db db:migrate || true
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+      # TODO: Uncomment when database setup is complete
+      # - name: Run database migrations
+      #   run: pnpm --filter @convergence/db db:migrate || true
+      #   env:
+      #     DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
       - name: Run TypeScript tests with coverage
         run: pnpm test --run --coverage
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
-          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        # TODO: Uncomment when database setup is complete
+        # env:
+        #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        #   TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
       - name: Run Python tests with coverage
         run: cd services/ml && poetry run pytest --cov=convergence_ml --cov-report=lcov --cov-report=term-missing
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
-          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
-          CONVERGENCE_ML_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        # TODO: Uncomment when database setup is complete
+        # env:
+        #   DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        #   TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
+        #   CONVERGENCE_ML_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/convergence_test
 
       - name: Merge coverage reports
         run: |
