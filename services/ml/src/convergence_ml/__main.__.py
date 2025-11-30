@@ -14,8 +14,8 @@ import sys
 def main(argv: list[str] | None = None) -> int:
     """Main entry point for the ConvergenceOS Machine Learning Services."""
     parser = argparse.ArgumentParser(
-        prog="convergence-ml"
-        description="ConvergenceOS Machine Learning Services"
+        prog="convergence-ml",
+        description="ConvergenceOS Machine Learning Services",
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -33,7 +33,9 @@ def main(argv: list[str] | None = None) -> int:
 
     # Model management commands
     models_parser = subparsers.add_parser("models", help="Model management")
-    models_subparsers = models_parser.add_subparsers(dest="models_command", help="Model management commands")
+    models_subparsers = models_parser.add_subparsers(
+        dest="models_command", help="Model management commands"
+    )
     models_subparsers.add_parser("download", help="Download required models")
     models_subparsers.add_parser("list", help="List available models")
 
@@ -47,17 +49,17 @@ def main(argv: list[str] | None = None) -> int:
         args.workers = 1
 
     if args.command == "serve":
-        return serve(args)
+        return run_server(args)
     elif args.command == "worker":
-        return worker(args)
+        return run_workers(args)
     elif args.command == "models":
-        return models(args)
+        return handle_models(args)
     else:
         parser.print_help()
         return 1
 
 
-def run_server(args: argparse.Namespace_) -> int:
+def run_server(args: argparse.Namespace) -> int:
     """Run the FastAPI server."""
     import uvicorn
 
@@ -71,20 +73,24 @@ def run_server(args: argparse.Namespace_) -> int:
     )
     return 0
 
-def run_workers(args: argparse.Namespace_) -> int:
+
+def run_workers(args: argparse.Namespace) -> int:
     """Run background worker for async jobs."""
     # TODO: Implement background worker
-    print(f"Worker mode net yet implemented. Queues: {args.queues}")
+    print(f"Worker mode not yet implemented. Queues: {args.queues}")
     return 1
+
 
 def handle_models(args: argparse.Namespace) -> int:
     """Handle model management commands."""
     if args.models_command == "download":
         from convergence_ml.models.sentence_transformer import download_models
+
         download_models()
         return 0
     elif args.models_command == "list":
         from convergence_ml.models.sentence_transformer import list_models
+
         list_models()
         return 0
     else:
@@ -92,6 +98,7 @@ def handle_models(args: argparse.Namespace) -> int:
         print("  download - Download required models")
         print("  list - List available models")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
