@@ -1,0 +1,762 @@
+/**
+ * ConvergenceOS Documentation - Aurora Mail Theme
+ *
+ * @fileoverview Custom CSS for Sphinx documentation matching the Aurora Mail aesthetic.
+ * Features ultra-light glassmorphism with NO black panels - only subtle glass over gradients.
+ *
+ * @description
+ * Aurora Mail design system:
+ * - Indigo/cyan gradients (#667eea to #4facfe)
+ * - Ultra-subtle glass: rgba(255, 255, 255, 0.05-0.08) in dark mode
+ * - Light glass: rgba(255, 255, 255, 0.7-0.85) in light mode
+ * - NO solid dark backgrounds
+ * - Backdrop blur: 10-16px
+ * - Animated gradient orbs in background
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - Aurora Mail Theme
+   ============================================================================ */
+
+:root {
+  /* Aurora Mail Color Palette */
+  --aurora-primary: #667eea;
+  --aurora-secondary: #764ba2;
+  --aurora-accent: #4facfe;
+  --aurora-teal: #3b9fd8;
+  --aurora-gold: #f6d365;
+
+  /* Light Mode - Aurora */
+  --bg-gradient-start: #f0f4ff;
+  --bg-gradient-mid: #e8eeff;
+  --bg-gradient-end: #f2f6ff;
+
+  --convergence-background: #f0f4ff;
+  --convergence-foreground: #1a1f36;
+  --convergence-card: transparent;
+  --convergence-card-foreground: #1a1f36;
+  --convergence-primary: #667eea;
+  --convergence-primary-foreground: #ffffff;
+  --convergence-secondary: #f3f4f6;
+  --convergence-secondary-foreground: #4a5568;
+  --convergence-muted: rgba(102, 126, 234, 0.05);
+  --convergence-muted-foreground: #718096;
+  --convergence-accent: rgba(102, 126, 234, 0.08);
+  --convergence-accent-foreground: #5568d3;
+  --convergence-border: rgba(102, 126, 234, 0.15);
+  --convergence-ring: #667eea;
+
+  /* Glassmorphism - Light Aurora */
+  --convergence-glass: rgba(255, 255, 255, 0.7);
+  --convergence-glass-strong: rgba(255, 255, 255, 0.85);
+  --convergence-glass-border: rgba(102, 126, 234, 0.15);
+
+  /* Shadows - Light mode */
+  --convergence-shadow-sm: 0 1px 2px 0 rgba(102, 126, 234, 0.05);
+  --convergence-shadow: 0 2px 4px 0 rgba(102, 126, 234, 0.08);
+  --convergence-shadow-md: 0 4px 8px 0 rgba(102, 126, 234, 0.1);
+  --convergence-shadow-lg: 0 8px 16px 0 rgba(102, 126, 234, 0.12);
+  --convergence-shadow-glass: 0 4px 16px rgba(102, 126, 234, 0.08);
+
+  /* Border Radius */
+  --convergence-radius: 0.375rem;
+  --convergence-radius-lg: 0.75rem;
+  --convergence-radius-xl: 1rem;
+
+  /* Animated orbs */
+  --orb-opacity: 0.3;
+  --orb-color-1: #c7d2fe;
+  --orb-color-2: #ddd6fe;
+  --orb-color-3: #bfdbfe;
+}
+
+/* Dark Mode - Aurora Mail Aesthetic */
+[data-theme="dark"] {
+  --bg-gradient-start: #0f1419;
+  --bg-gradient-mid: #1a1f35;
+  --bg-gradient-end: #0f1922;
+
+  --convergence-background: #0f1419;
+  --convergence-foreground: #ffffff;
+  --convergence-card: transparent;
+  --convergence-card-foreground: #ffffff;
+  --convergence-primary: #667eea;
+  --convergence-primary-foreground: #ffffff;
+  --convergence-secondary: transparent;
+  --convergence-secondary-foreground: #d1d5db;
+  --convergence-muted: rgba(255, 255, 255, 0.04);
+  --convergence-muted-foreground: #9ca3af;
+  --convergence-accent: rgba(102, 126, 234, 0.2);
+  --convergence-accent-foreground: #4facfe;
+  --convergence-border: rgba(255, 255, 255, 0.1);
+  --convergence-ring: #667eea;
+
+  /* Glassmorphism - Aurora Dark: Subtle white tint, NO black backgrounds */
+  --convergence-glass: rgba(255, 255, 255, 0.05);
+  --convergence-glass-strong: rgba(255, 255, 255, 0.08);
+  --convergence-glass-border: rgba(255, 255, 255, 0.1);
+
+  /* Shadows - Minimal, colored */
+  --convergence-shadow-sm: none;
+  --convergence-shadow: none;
+  --convergence-shadow-md: none;
+  --convergence-shadow-lg: none;
+  --convergence-shadow-glass: 0 4px 16px rgba(102, 126, 234, 0.08);
+
+  /* Animated orbs - darker colors */
+  --orb-opacity: 0.2;
+  --orb-color-1: #6366f1;
+  --orb-color-2: #a855f7;
+  --orb-color-3: #3b82f6;
+}
+
+/* ============================================================================
+   FURO THEME OVERRIDES - Brand Colors
+   ============================================================================ */
+
+:root {
+  --color-brand-primary: #667eea !important;
+  --color-brand-content: #667eea !important;
+}
+
+[data-theme="dark"] {
+  --color-brand-primary: #667eea !important;
+  --color-brand-content: #667eea !important;
+}
+
+/* ============================================================================
+   BODY & BACKGROUND - Aurora Mail Gradients
+   ============================================================================ */
+
+body {
+  background: linear-gradient(
+    135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-mid) 50%,
+    var(--bg-gradient-end) 100%
+  );
+  color: var(--convergence-foreground);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Animated background orbs - Aurora Mail style */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  filter: blur(64px);
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+  z-index: 0;
+  opacity: var(--orb-opacity);
+}
+
+body::before {
+  width: 24rem;
+  height: 24rem;
+  background-color: var(--orb-color-1);
+  top: 5rem;
+  left: 5rem;
+}
+
+body::after {
+  width: 24rem;
+  height: 24rem;
+  background-color: var(--orb-color-2);
+  top: 10rem;
+  right: 5rem;
+  animation-delay: 2s;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: var(--orb-opacity);
+  }
+  50% {
+    opacity: calc(var(--orb-opacity) * 0.5);
+  }
+}
+
+[data-theme="dark"] body::before,
+[data-theme="dark"] body::after {
+  mix-blend-mode: normal;
+}
+
+/* Full-width layout - remove Furo's auto margins */
+.page {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================================
+   SIDEBAR STYLING - Ultra-light Glass
+   ============================================================================ */
+
+/* Left sidebar - fixed to left edge of screen */
+.sidebar-drawer {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid var(--convergence-glass-border);
+  box-shadow: none;
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  height: 100vh !important;
+  width: 15em !important;
+  z-index: 100;
+}
+
+.sidebar-brand-text {
+  color: var(--convergence-primary);
+  font-weight: 700;
+}
+
+.sidebar-tree .reference {
+  color: var(--convergence-foreground);
+  transition: all 0.2s ease;
+}
+
+.sidebar-tree .reference:hover {
+  color: var(--convergence-primary);
+  background-color: var(--convergence-muted);
+  border-radius: var(--convergence-radius);
+}
+
+.sidebar-tree .current > .reference {
+  background: var(--convergence-accent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--convergence-primary);
+  border-radius: var(--convergence-radius);
+  border: 1px solid var(--convergence-glass-border);
+  font-weight: 600;
+}
+
+/* ============================================================================
+   MAIN CONTENT AREA
+   ============================================================================ */
+
+/* Article container - add padding to avoid sidebar overlap */
+.article-container {
+  padding-left: 16em !important; /* Space for left sidebar + gap */
+  padding-right: 16em !important; /* Space for right TOC + gap */
+}
+
+/* Content area - centered with fixed width within the padded container */
+.content {
+  width: 85em !important; /* Wider content area */
+  max-width: calc(100% - 2em) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.main-content {
+  background-color: transparent;
+  padding: 2rem 3rem;
+}
+
+article {
+  max-width: 100%;
+  color: var(--convergence-foreground);
+}
+
+/* Right TOC sidebar - fixed to right edge of screen */
+.toc-drawer {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-left: 1px solid var(--convergence-glass-border);
+  box-shadow: none;
+  position: fixed !important;
+  right: 0 !important;
+  top: 0 !important;
+  height: 100vh !important;
+  width: 15em !important;
+  z-index: 100;
+}
+
+/* ============================================================================
+   HEADINGS
+   ============================================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--convergence-foreground);
+  font-weight: 700;
+}
+
+h1 {
+  color: var(--convergence-primary);
+  border-bottom: 2px solid var(--convergence-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  border-bottom: 1px solid var(--convergence-border);
+  padding-bottom: 0.375rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  color: var(--convergence-accent-foreground);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Permalink hover style */
+.headerlink {
+  color: var(--convergence-muted-foreground);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink {
+  opacity: 1;
+}
+
+.headerlink:hover {
+  color: var(--convergence-primary);
+}
+
+/* ============================================================================
+   LINKS
+   ============================================================================ */
+
+a {
+  color: var(--convergence-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--convergence-accent-foreground);
+  text-decoration: underline;
+}
+
+a code {
+  color: var(--convergence-primary);
+}
+
+/* ============================================================================
+   CODE BLOCKS & INLINE CODE - Glass Effect
+   ============================================================================ */
+
+code {
+  background: var(--convergence-glass-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--convergence-accent-foreground);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--convergence-radius);
+  font-size: 0.875em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  border: 1px solid var(--convergence-glass-border);
+}
+
+pre {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius-lg);
+  padding: 1rem;
+  overflow-x: auto;
+  box-shadow: none;
+}
+
+pre code {
+  background-color: transparent;
+  color: var(--convergence-foreground);
+  padding: 0;
+  border: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Syntax highlighting adjustments */
+.highlight {
+  border-radius: var(--convergence-radius-lg);
+}
+
+/* ============================================================================
+   ADMONITIONS (Notes, Warnings, etc.) - Glass Panels
+   ============================================================================ */
+
+.admonition {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+  border-left: 2px solid var(--convergence-primary);
+  border-radius: var(--convergence-radius-lg);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  box-shadow: none;
+}
+
+.admonition-title {
+  color: var(--convergence-primary);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.admonition.note {
+  border-left-color: var(--convergence-primary);
+}
+
+.admonition.warning {
+  border-left-color: #f59e0b;
+}
+
+.admonition.warning .admonition-title {
+  color: #f59e0b;
+}
+
+.admonition.danger {
+  border-left-color: #ef4444;
+}
+
+.admonition.danger .admonition-title {
+  color: #ef4444;
+}
+
+.admonition.tip {
+  border-left-color: #10b981;
+}
+
+.admonition.tip .admonition-title {
+  color: #10b981;
+}
+
+/* ============================================================================
+   TABLES - Glass Effect
+   ============================================================================ */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+  border-radius: var(--convergence-radius-lg);
+  overflow: hidden;
+  box-shadow: none;
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+}
+
+thead {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.15),
+    rgba(79, 172, 254, 0.15)
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--convergence-primary);
+  border-bottom: 1px solid var(--convergence-glass-border);
+}
+
+th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--convergence-border);
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--convergence-border);
+}
+
+tbody tr {
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+tbody tr:hover {
+  background: var(--convergence-glass-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================================================
+   BUTTONS & INTERACTIVE ELEMENTS - Aurora Glass Button Style
+   ============================================================================ */
+
+button,
+.btn,
+.button {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.08),
+    rgba(79, 172, 254, 0.08)
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--convergence-foreground);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius);
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: none;
+}
+
+button:hover,
+.btn:hover,
+.button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.15),
+    rgba(79, 172, 254, 0.15)
+  );
+  border-color: var(--convergence-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.button-primary {
+  background: linear-gradient(135deg, #667eea, #4facfe);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.button-primary:hover {
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+/* ============================================================================
+   SEARCH BOX
+   ============================================================================ */
+
+.search-input {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius);
+  color: var(--convergence-foreground);
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--convergence-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================================================
+   CARDS & CONTAINERS - Glass Effect
+   ============================================================================ */
+
+.card,
+.container {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--convergence-shadow-glass);
+}
+
+/* Glassmorphism effect for special containers */
+.glass-container {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius-lg);
+  box-shadow: var(--convergence-shadow-glass);
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING - Aurora Gradient
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--convergence-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #4facfe);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7e8ff5, #6dbcff);
+}
+
+/* ============================================================================
+   API DOCUMENTATION STYLING
+   ============================================================================ */
+
+.sig {
+  background: var(--convergence-glass);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--convergence-glass-border);
+  border-radius: var(--convergence-radius);
+  padding: 0.5rem 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  overflow-x: auto;
+}
+
+.sig-name {
+  color: var(--convergence-primary);
+  font-weight: 600;
+}
+
+.sig-param {
+  color: var(--convergence-accent-foreground);
+}
+
+dt {
+  font-weight: 600;
+  color: var(--convergence-primary);
+  margin-top: 1rem;
+}
+
+dd {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  border-top: 1px solid var(--convergence-border);
+  color: var(--convergence-muted-foreground);
+  padding: 2rem 0;
+  margin-top: 4rem;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 1200px) {
+  /* Hide right TOC sidebar on smaller screens */
+  .toc-drawer {
+    display: none !important;
+  }
+
+  .main {
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Hide left sidebar on mobile, show as overlay/drawer */
+  .sidebar-drawer {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-drawer.open {
+    transform: translateX(0);
+  }
+
+  .main {
+    margin-left: 0 !important;
+  }
+
+  .main-content {
+    padding: 1rem 1.5rem;
+  }
+
+  article {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .admonition {
+    padding: 0.75rem 1rem;
+  }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Reduce orb sizes on mobile */
+  body::before,
+  body::after {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  body::before,
+  body::after {
+    display: none;
+  }
+
+  .sidebar-drawer {
+    display: none;
+  }
+
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  pre,
+  code {
+    border: 1px solid #ddd;
+  }
+}
