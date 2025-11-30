@@ -69,6 +69,15 @@
       ]
     },
 
+    // Tests with coverage
+    "test:coverage": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"],
+      "env": [
+        "TEST_DATABASE_URL"
+      ]
+    },
+
     // TypeScript checking - needs built dependencies for cross-package types
     "typecheck": {
       "dependsOn": ["^build"]
