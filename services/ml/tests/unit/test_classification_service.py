@@ -130,54 +130,54 @@ class TestClassificationService:
         assert result.confidence == 0.0
         assert not result.is_spam
 
-    async def test_check_spam_batch_trained(self, service, mock_spam_classifier):
+    def test_check_spam_batch_trained(self, service, mock_spam_classifier):
         """Test batch spam checking with trained classifier."""
         texts = ["text1", "text2"]
-        results = await service.check_spam_batch(texts)
+        results = service.check_spam_batch(texts)
         assert len(results) == 1
         mock_spam_classifier.predict_batch.assert_called_once_with(texts)
 
-    async def test_check_spam_batch_untrained(self):
+    def test_check_spam_batch_untrained(self):
         """Test batch spam checking with untrained classifier."""
         untrained_classifier = Mock()
         untrained_classifier.is_trained = False
         service = ClassificationService(spam_classifier=untrained_classifier)
 
-        results = await service.check_spam_batch(["text1", "text2"])
+        results = service.check_spam_batch(["text1", "text2"])
         assert len(results) == 2
         assert all(r.label == "unknown" for r in results)
 
-    async def test_categorize_trained(self, service, mock_content_classifier):
+    def test_categorize_trained(self, service, mock_content_classifier):
         """Test categorization with trained classifier."""
-        result = await service.categorize("Meeting notes")
+        result = service.categorize("Meeting notes")
         assert isinstance(result, MultiLabelResult)
         assert "work" in result.labels
         mock_content_classifier.predict_multi.assert_called_once_with("Meeting notes")
 
-    async def test_categorize_untrained(self):
+    def test_categorize_untrained(self):
         """Test categorization with untrained classifier."""
         untrained_classifier = Mock()
         untrained_classifier.is_trained = False
         service = ClassificationService(content_classifier=untrained_classifier)
 
-        result = await service.categorize("test")
+        result = service.categorize("test")
         assert result.labels == []
         assert result.scores == {}
 
-    async def test_categorize_batch_trained(self, service, mock_content_classifier):
+    def test_categorize_batch_trained(self, service, mock_content_classifier):
         """Test batch categorization with trained classifier."""
         texts = ["text1", "text2"]
-        results = await service.categorize_batch(texts)
+        results = service.categorize_batch(texts)
         assert len(results) == 1
         mock_content_classifier.predict_multi_batch.assert_called_once_with(texts)
 
-    async def test_categorize_batch_untrained(self):
+    def test_categorize_batch_untrained(self):
         """Test batch categorization with untrained classifier."""
         untrained_classifier = Mock()
         untrained_classifier.is_trained = False
         service = ClassificationService(content_classifier=untrained_classifier)
 
-        results = await service.categorize_batch(["text1", "text2"])
+        results = service.categorize_batch(["text1", "text2"])
         assert len(results) == 2
         assert all(r.labels == [] for r in results)
 

@@ -384,7 +384,7 @@ class HighlightService:
 
         return result.related_documents
 
-    async def get_highlight_context(
+    def get_highlight_context(
         self,
         document_id: str,
         _highlight_start: int,
@@ -410,7 +410,7 @@ class HighlightService:
             which may need to be fetched from another service.
 
         Example:
-            >>> text, context = await service.get_highlight_context(
+            >>> text, context = service.get_highlight_context(
             ...     document_id="note-123",
             ...     highlight_start=100,
             ...     highlight_end=150,

@@ -112,7 +112,7 @@ async def categorize_content(
     )
 
     try:
-        result = await service.categorize(request.text)
+        result = service.categorize(request.text)
 
         return CategoryResponse(
             success=True,

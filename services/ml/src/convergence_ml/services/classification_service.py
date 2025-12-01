@@ -181,7 +181,7 @@ class ClassificationService:
 
         return self.spam_classifier.predict(text)
 
-    async def check_spam_batch(self, texts: list[str]) -> list[SpamResult]:
+    def check_spam_batch(self, texts: list[str]) -> list[SpamResult]:
         """Check spam for multiple texts.
 
         Args:
@@ -191,7 +191,7 @@ class ClassificationService:
             List of SpamResult objects.
 
         Example:
-            >>> results = await service.check_spam_batch(["text1", "text2"])
+            >>> results = service.check_spam_batch(["text1", "text2"])
             >>> spam_count = sum(1 for r in results if r.is_spam)
         """
         if not self.spam_classifier.is_trained:
@@ -208,7 +208,7 @@ class ClassificationService:
 
         return self.spam_classifier.predict_batch(texts)
 
-    async def categorize(self, text: str) -> MultiLabelResult:
+    def categorize(self, text: str) -> MultiLabelResult:
         """Categorize text into content categories.
 
         Args:
@@ -221,7 +221,7 @@ class ClassificationService:
             RuntimeError: If classifier is not trained.
 
         Example:
-            >>> result = await service.categorize("Meeting notes for project X")
+            >>> result = service.categorize("Meeting notes for project X")
             >>> print(f"Categories: {result.labels}")
             >>> print(f"Top category: {result.top_label}")
         """
@@ -237,7 +237,7 @@ class ClassificationService:
 
         return self.content_classifier.predict_multi(text)
 
-    async def categorize_batch(self, texts: list[str]) -> list[MultiLabelResult]:
+    def categorize_batch(self, texts: list[str]) -> list[MultiLabelResult]:
         """Categorize multiple texts.
 
         Args:
@@ -247,7 +247,7 @@ class ClassificationService:
             List of MultiLabelResult objects.
 
         Example:
-            >>> results = await service.categorize_batch(["text1", "text2"])
+            >>> results = service.categorize_batch(["text1", "text2"])
         """
         from convergence_ml.models.classifiers.base import MultiLabelResult
 
@@ -294,7 +294,7 @@ class ClassificationService:
             spam_result = self.check_spam(text)
 
         if categorize:
-            category_result = await self.categorize(text)
+            category_result = self.categorize(text)
 
         processing_time = (time.time() - start) * 1000  # Convert to ms
 

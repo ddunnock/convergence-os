@@ -600,8 +600,7 @@ async def test_find_mentions_with_entity_type(
 # ============================================================================
 
 
-@pytest.mark.asyncio
-async def test_get_highlight_context_placeholder(
+def test_get_highlight_context_placeholder(
     mock_embedding_generator,
     mock_vector_store,
     mock_settings,
@@ -613,7 +612,7 @@ async def test_get_highlight_context_placeholder(
         settings=mock_settings,
     )
 
-    text, context = await service.get_highlight_context(
+    text, context = service.get_highlight_context(
         document_id="doc-123",
         _highlight_start=100,
         _highlight_end=150,
