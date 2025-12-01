@@ -18,16 +18,14 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-import numpy as np
 import pytest
 
+from convergence_ml.models.classifiers.base import ClassificationResult, MultiLabelResult
 from convergence_ml.models.classifiers.content_type import (
     DEFAULT_CATEGORIES,
     DEFAULT_DOCUMENT_TYPES,
     ContentTypeClassifier,
 )
-from convergence_ml.models.classifiers.base import ClassificationResult, MultiLabelResult
-
 
 # ============================================================================
 # Fixtures
@@ -212,17 +210,17 @@ def test_predict_multi_threshold(
 ) -> None:
     """Test that threshold affects label selection."""
     texts, labels = sample_multi_label_data
-    
+
     # Low threshold classifier
     low_thresh = ContentTypeClassifier(threshold=0.3)
     low_thresh.train_multi(texts, labels)
-    
+
     # High threshold classifier
     high_thresh = ContentTypeClassifier(threshold=0.7)
     high_thresh.train_multi(texts, labels)
 
     test_text = "Meeting notes for project planning"
-    
+
     result_low = low_thresh.predict_multi(test_text)
     result_high = high_thresh.predict_multi(test_text)
 
@@ -379,7 +377,7 @@ def test_predict_multi_no_labels_above_threshold(
 ) -> None:
     """Test prediction when no labels exceed threshold."""
     texts, labels = sample_multi_label_data
-    
+
     # Very high threshold
     classifier = ContentTypeClassifier(threshold=0.99)
     classifier.train_multi(texts, labels)
@@ -396,7 +394,7 @@ def test_predict_single_returns_unknown_if_no_labels(
 ) -> None:
     """Test that single prediction returns 'unknown' if no labels."""
     texts, labels = sample_multi_label_data
-    
+
     classifier = ContentTypeClassifier(threshold=0.99)
     classifier.train_multi(texts, labels)
 
@@ -488,9 +486,7 @@ def test_train_with_malicious_categories() -> None:
         ["normal"],
     ]
 
-    classifier = ContentTypeClassifier(
-        categories=["<script>alert(1)</script>", "normal"]
-    )
+    classifier = ContentTypeClassifier(categories=["<script>alert(1)</script>", "normal"])
     metrics = classifier.train_multi(texts, labels)
 
     # Should train without crashing
@@ -753,7 +749,7 @@ def test_load_model_data_restores_state(
     """Test that _load_model_data correctly restores classifier state."""
     texts, labels = sample_multi_label_data
     custom_categories = ["work", "personal", "urgent"]
-    
+
     classifier = ContentTypeClassifier(categories=custom_categories, threshold=0.6)
     classifier.train_multi(texts, labels)
 
@@ -848,7 +844,7 @@ def test_end_to_end_workflow() -> None:
 def test_custom_categories_workflow() -> None:
     """Test workflow with custom categories."""
     custom_categories = ["bug", "feature", "docs", "test"]
-    
+
     texts = [
         "Fix login bug in authentication module",
         "Add new feature for user profiles",

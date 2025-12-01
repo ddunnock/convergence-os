@@ -225,7 +225,7 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
     () => -1,
     () => Infinity,
     () => -Infinity,
-    () => NaN,
+    () => Number.NaN,
     () => Number.MAX_SAFE_INTEGER,
     () => Number.MIN_SAFE_INTEGER,
     // Strings
@@ -393,41 +393,43 @@ export function networkFailure(
     errorType = "network",
   } = options;
 
-  const originalFetch = global.fetch;
+  const originalFetch = globalThis.fetch;
   const pattern =
     typeof urlPattern === "string" ? new RegExp(urlPattern) : urlPattern;
 
-  global.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    let url: string;
-    if (typeof input === "string") {
-      url = input;
-    } else if (input instanceof URL) {
-      url = input.toString();
-    } else {
-      url = input.url;
-    }
-
-    // SECURITY: Math.random() is appropriate for test simulation purposes
-    if (pattern.test(url) && Math.random() < failureProbability) {
-      if (delayMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
+  globalThis.fetch = vi.fn(
+    async (input: RequestInfo | URL, init?: RequestInit) => {
+      let url: string;
+      if (typeof input === "string") {
+        url = input;
+      } else if (input instanceof URL) {
+        url = input.toString();
+      } else {
+        url = input.url;
       }
 
-      const errors: Record<string, Error> = {
-        timeout: new DOMException("The operation timed out.", "TimeoutError"),
-        network: new TypeError("Failed to fetch"),
-        abort: new DOMException("The operation was aborted.", "AbortError"),
-        cors: new TypeError("Failed to fetch (CORS)"),
-      };
+      // SECURITY: Math.random() is appropriate for test simulation purposes
+      if (pattern.test(url) && Math.random() < failureProbability) {
+        if (delayMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
 
-      throw errors[errorType];
+        const errors: Record<string, Error> = {
+          timeout: new DOMException("The operation timed out.", "TimeoutError"),
+          network: new TypeError("Failed to fetch"),
+          abort: new DOMException("The operation was aborted.", "AbortError"),
+          cors: new TypeError("Failed to fetch (CORS)"),
+        };
+
+        throw errors[errorType];
+      }
+
+      return originalFetch(input, init);
     }
-
-    return originalFetch(input, init);
-  });
+  );
 
   return () => {
-    global.fetch = originalFetch;
+    globalThis.fetch = originalFetch;
   };
 }
 

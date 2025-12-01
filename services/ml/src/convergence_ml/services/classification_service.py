@@ -305,7 +305,7 @@ class ClassificationService:
             processing_time_ms=processing_time,
         )
 
-    async def train_spam_classifier(
+    def train_spam_classifier(
         self,
         texts: list[str],
         labels: list[str],
@@ -324,7 +324,7 @@ class ClassificationService:
         Example:
             >>> texts = ["Buy now!", "Hello friend", "Free money!"]
             >>> labels = ["spam", "ham", "spam"]
-            >>> metrics = await service.train_spam_classifier(texts, labels)
+            >>> metrics = service.train_spam_classifier(texts, labels)
             >>> print(f"F1 Score: {metrics['f1']:.2f}")
         """
         metrics = self.spam_classifier.train(texts, labels)
@@ -337,7 +337,7 @@ class ClassificationService:
 
         return metrics
 
-    async def train_content_classifier(
+    def train_content_classifier(
         self,
         texts: list[str],
         labels_list: list[list[str]],
@@ -356,7 +356,7 @@ class ClassificationService:
         Example:
             >>> texts = ["Meeting notes", "Personal diary"]
             >>> labels = [["work", "meeting"], ["personal", "notes"]]
-            >>> metrics = await service.train_content_classifier(texts, labels)
+            >>> metrics = service.train_content_classifier(texts, labels)
         """
         metrics = self.content_classifier.train_multi(texts, labels_list)
 

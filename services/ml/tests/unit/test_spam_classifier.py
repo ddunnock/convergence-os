@@ -751,9 +751,18 @@ def test_custom_labels_end_to_end() -> None:
     """Test end-to-end workflow with custom spam/ham labels."""
     # Use larger dataset to avoid validation split issues
     texts = [
-        "junk mail 1", "good email 1", "junk mail 2", "good email 2",
-        "junk mail 3", "good email 3", "junk mail 4", "good email 4",
-        "junk mail 5", "good email 5", "junk mail 6", "good email 6",
+        "junk mail 1",
+        "good email 1",
+        "junk mail 2",
+        "good email 2",
+        "junk mail 3",
+        "good email 3",
+        "junk mail 4",
+        "good email 4",
+        "junk mail 5",
+        "good email 5",
+        "junk mail 6",
+        "good email 6",
     ]
     labels = ["junk", "good"] * 6
 

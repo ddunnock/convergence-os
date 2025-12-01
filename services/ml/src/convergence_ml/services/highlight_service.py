@@ -25,7 +25,7 @@ from convergence_ml.db.vector_store import VectorStore, get_vector_store
 from convergence_ml.models.sentence_transformer import EmbeddingGenerator
 
 if TYPE_CHECKING:
-    pass
+    from collections.abc import Sequence  # noqa: F401 - Used for type checking
 
 logger = get_logger(__name__)
 

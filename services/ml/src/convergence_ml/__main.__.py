@@ -74,9 +74,16 @@ def run_server(args: argparse.Namespace) -> int:
 
 
 def run_workers(args: argparse.Namespace) -> int:
-    """Run background worker for async jobs."""
-    # TODO: Implement background worker
+    """Run background worker for async jobs.
+
+    Worker implementation is planned for future releases.
+    Will support task queue processing for:
+    - Batch document embedding
+    - Model training jobs
+    - Periodic cleanup tasks
+    """
     print(f"Worker mode not yet implemented. Queues: {args.queues}")
+    print("Planned features: batch embedding, model training, cleanup tasks")
     return 1
 
 

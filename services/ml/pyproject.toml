@@ -128,7 +128,17 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["D", "S101"]  # Don't require docstrings in tests, allow assert
+"tests/**/*.py" = [
+    "D",      # Don't require docstrings in tests
+    "S101",   # Allow assert in tests
+    "ARG",    # Allow unused arguments in test fixtures/mocks
+    "F841",   # Allow unused variables in tests (intentional checks)
+    "B007",   # Allow unused loop variables in tests
+    "E402",   # Allow delayed imports after environment setup
+]
+"src/convergence_ml/api/deps.py" = [
+    "E402",   # Allow lazy imports after async/env checks
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

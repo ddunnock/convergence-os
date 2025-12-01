@@ -74,3 +74,6 @@ ENV/
 
 # IDE
 .idea/
+
+# Sentence transformer model cache
+services/ml/model_artifacts/

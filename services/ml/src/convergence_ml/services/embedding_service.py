@@ -265,7 +265,7 @@ class EmbeddingService:
             failed=failed,
             skipped=skipped,
             results=results,
-            errors=errors or [],
+            errors=errors,
         )
 
     async def _prepare_batch_documents(

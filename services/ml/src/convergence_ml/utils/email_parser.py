@@ -22,7 +22,7 @@ from convergence_ml.core.logging import get_logger
 from convergence_ml.utils.text_preprocessing import clean_text, strip_html
 
 if TYPE_CHECKING:
-    pass
+    from typing import Any  # noqa: F401 - Used for type checking
 
 logger = get_logger(__name__)
 
@@ -184,59 +184,100 @@ def _extract_body(msg: Message) -> tuple[str, str, list[str]]:
     Returns:
         Tuple of (text_body, html_body, attachments).
     """
+    if msg.is_multipart():
+        return _extract_multipart_body(msg)
+    else:
+        return _extract_simple_body(msg)
+
+
+def _extract_multipart_body(msg: Message) -> tuple[str, str, list[str]]:
+    """Extract body from multipart email.
+
+    Args:
+        msg: Email message object.
+
+    Returns:
+        Tuple of (text_body, html_body, attachments).
+    """
     text_body = ""
     html_body = ""
     attachments: list[str] = []
 
-    if msg.is_multipart():
-        for part in msg.walk():
-            content_type = part.get_content_type()
-            disposition = str(part.get("Content-Disposition", ""))
+    for part in msg.walk():
+        content_type = part.get_content_type()
+        disposition = str(part.get("Content-Disposition", ""))
 
-            # Skip attachments for body extraction
-            if "attachment" in disposition:
-                filename = part.get_filename()
-                if filename:
-                    attachments.append(_decode_header(filename))
-                continue
+        # Handle attachments
+        if "attachment" in disposition:
+            filename = part.get_filename()
+            if filename:
+                attachments.append(_decode_header(filename))
+            continue
 
-            # Extract text content
-            if content_type == "text/plain" and not text_body:
-                payload = part.get_payload(decode=True)
-                if isinstance(payload, bytes):
-                    charset = part.get_content_charset() or "utf-8"
-                    try:
-                        text_body = payload.decode(charset, errors="replace")
-                    except Exception:
-                        text_body = payload.decode("utf-8", errors="replace")
+        # Extract text content
+        if content_type == "text/plain" and not text_body:
+            text_body = _decode_part_payload(part)
 
-            # Extract HTML content
-            elif content_type == "text/html" and not html_body:
-                payload = part.get_payload(decode=True)
-                if isinstance(payload, bytes):
-                    charset = part.get_content_charset() or "utf-8"
-                    try:
-                        html_body = payload.decode(charset, errors="replace")
-                    except Exception:
-                        html_body = payload.decode("utf-8", errors="replace")
-    else:
-        # Simple non-multipart email
-        content_type = msg.get_content_type()
-        payload = msg.get_payload(decode=True)
-
-        if isinstance(payload, bytes):
-            charset = msg.get_content_charset() or "utf-8"
-            try:
-                content = payload.decode(charset, errors="replace")
-            except Exception:
-                content = payload.decode("utf-8", errors="replace")
-
-            if content_type == "text/html":
-                html_body = content
-            else:
-                text_body = content
+        # Extract HTML content
+        elif content_type == "text/html" and not html_body:
+            html_body = _decode_part_payload(part)
 
     return text_body.strip(), html_body.strip(), attachments
+
+
+def _extract_simple_body(msg: Message) -> tuple[str, str, list[str]]:
+    """Extract body from simple non-multipart email.
+
+    Args:
+        msg: Email message object.
+
+    Returns:
+        Tuple of (text_body, html_body, attachments).
+    """
+    content_type = msg.get_content_type()
+    payload = msg.get_payload(decode=True)
+
+    if not isinstance(payload, bytes):
+        return "", "", []
+
+    content = _decode_payload(payload, msg.get_content_charset())
+
+    if content_type == "text/html":
+        return "", content.strip(), []
+    else:
+        return content.strip(), "", []
+
+
+def _decode_part_payload(part: Message) -> str:
+    """Decode payload from an email part.
+
+    Args:
+        part: Email message part.
+
+    Returns:
+        Decoded text content.
+    """
+    payload = part.get_payload(decode=True)
+    if isinstance(payload, bytes):
+        return _decode_payload(payload, part.get_content_charset())
+    return ""
+
+
+def _decode_payload(payload: bytes, charset: str | None) -> str:
+    """Decode bytes payload with fallback encoding.
+
+    Args:
+        payload: Bytes payload.
+        charset: Charset to use for decoding.
+
+    Returns:
+        Decoded string.
+    """
+    charset = charset or "utf-8"
+    try:
+        return payload.decode(charset, errors="replace")
+    except Exception:
+        return payload.decode("utf-8", errors="replace")
 
 
 def _decode_header(header_value: str) -> str:
@@ -313,9 +354,21 @@ def _parse_address_list(addresses_str: str) -> list[str]:
         return []
 
     addresses_str = _decode_header(addresses_str)
+    address_tokens = _split_addresses_by_comma(addresses_str)
 
-    # Split by comma, handling quoted strings
-    addresses = []
+    return _extract_addresses_from_tokens(address_tokens)
+
+
+def _split_addresses_by_comma(addresses_str: str) -> list[str]:
+    """Split address string by comma, respecting quoted sections.
+
+    Args:
+        addresses_str: Comma-separated addresses.
+
+    Returns:
+        List of address tokens.
+    """
+    tokens = []
     current = ""
     in_quotes = False
 
@@ -325,19 +378,32 @@ def _parse_address_list(addresses_str: str) -> list[str]:
             current += char
         elif char == "," and not in_quotes:
             if current.strip():
-                addr, _ = _parse_address(current.strip())
-                if addr:
-                    addresses.append(addr)
+                tokens.append(current.strip())
             current = ""
         else:
             current += char
 
-    # Don't forget the last one
+    # Add the last token
     if current.strip():
-        addr, _ = _parse_address(current.strip())
+        tokens.append(current.strip())
+
+    return tokens
+
+
+def _extract_addresses_from_tokens(tokens: list[str]) -> list[str]:
+    """Extract email addresses from parsed tokens.
+
+    Args:
+        tokens: List of address tokens.
+
+    Returns:
+        List of email addresses.
+    """
+    addresses = []
+    for token in tokens:
+        addr, _ = _parse_address(token)
         if addr:
             addresses.append(addr)
-
     return addresses
 
 

@@ -1,6 +1,6 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
-import path from "path";
+import path from "node:path";
 
 export default defineConfig({
   plugins: [react()],
@@ -24,7 +24,11 @@ export default defineConfig({
         lines: 80,
       },
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.test.{ts,tsx}", "src/**/index.ts", "src/test-setup.ts"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/**/index.ts",
+        "src/test-setup.ts",
+      ],
     },
   },
 });

@@ -1,23 +1,40 @@
 /**
- * @fileoverview AlertDialog component for important confirmations.
- * Provides accessible modal dialogs for actions that require user confirmation,
- * built on Radix UI Alert Dialog primitives.
  * @module @convergence/ui/components/ui/alert-dialog
+ * @file AlertDialog component for important confirmations. Provides accessible
+ *   modal dialogs for actions that require user confirmation, built on Radix UI
+ *   Alert Dialog primitives.
  */
 
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
+import * as React from "react";
+import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
 /**
  * Root component for the AlertDialog.
  *
- * @description Provides the context for all AlertDialog sub-components.
- * Manages the open/closed state of the dialog.
+ * Provides the context for all AlertDialog sub-components. Manages the
+ * open/closed state of the dialog.
+ *
+ * @example
+ *   ```tsx
+ *   <AlertDialog>
+ *     <AlertDialogTrigger>Open</AlertDialogTrigger>
+ *     <AlertDialogContent>
+ *       <AlertDialogHeader>
+ *         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+ *         <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+ *       </AlertDialogHeader>
+ *       <AlertDialogFooter>
+ *         <AlertDialogCancel>Cancel</AlertDialogCancel>
+ *         <AlertDialogAction>Continue</AlertDialogAction>
+ *       </AlertDialogFooter>
+ *     </AlertDialogContent>
+ *   </AlertDialog>
+ *   ```;
  *
  * @param props - AlertDialog root props from Radix UI
  * @param props.open - Controlled open state
@@ -25,43 +42,25 @@ import { buttonVariants } from "@/components/ui/button"
  * @param props.onOpenChange - Callback when open state changes
  * @param props.children - AlertDialog trigger and content
  * @returns React AlertDialog root component
- *
- * @example
- * ```tsx
- * <AlertDialog>
- *   <AlertDialogTrigger>Open</AlertDialogTrigger>
- *   <AlertDialogContent>
- *     <AlertDialogHeader>
- *       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
- *       <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
- *     </AlertDialogHeader>
- *     <AlertDialogFooter>
- *       <AlertDialogCancel>Cancel</AlertDialogCancel>
- *       <AlertDialogAction>Continue</AlertDialogAction>
- *     </AlertDialogFooter>
- *   </AlertDialogContent>
- * </AlertDialog>
- * ```
- *
  * @see {@link https://www.radix-ui.com/primitives/docs/components/alert-dialog Radix UI AlertDialog}
  */
 function AlertDialog({
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
-  return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
+}: Readonly<React.ComponentProps<typeof AlertDialogPrimitive.Root>>) {
+  return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
 }
 
 /**
  * Trigger button that opens the AlertDialog.
  *
- * @description Renders a button that, when clicked, opens the associated
- * AlertDialog. Can be styled with any button variant.
+ * Renders a button that, when clicked, opens the associated AlertDialog. Can be
+ * styled with any button variant.
  *
  * @param props - Trigger props from Radix UI
- * @param props.asChild - Merge props onto child element instead of rendering button
+ * @param props.asChild - Merge props onto child element instead of rendering
+ *   button
  * @param props.children - Trigger content
  * @returns React button element that triggers the dialog
- *
  * @see {@link AlertDialog} For the parent container
  */
 function AlertDialogTrigger({
@@ -69,17 +68,18 @@ function AlertDialogTrigger({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
   return (
     <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />
-  )
+  );
 }
 
 /**
  * Portal container for rendering AlertDialog outside the DOM hierarchy.
  *
- * @description Renders AlertDialog content into a portal, ensuring proper
- * stacking context and avoiding z-index issues.
+ * Renders AlertDialog content into a portal, ensuring proper stacking context
+ * and avoiding z-index issues.
  *
  * @param props - Portal props from Radix UI
- * @param props.container - DOM element to render into (defaults to document.body)
+ * @param props.container - DOM element to render into (defaults to
+ *   document.body)
  * @param props.children - Content to render in portal
  * @returns React portal component
  */
@@ -88,14 +88,14 @@ function AlertDialogPortal({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
   return (
     <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
-  )
+  );
 }
 
 /**
  * Semi-transparent overlay behind the AlertDialog.
  *
- * @description Renders a full-screen overlay that dims the background content.
- * Includes fade-in/fade-out animations for open/close states.
+ * Renders a full-screen overlay that dims the background content. Includes
+ * fade-in/fade-out animations for open/close states.
  *
  * @param props - Overlay props from Radix UI
  * @param props.className - Additional CSS classes
@@ -114,33 +114,33 @@ function AlertDialogOverlay({
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Main content container for the AlertDialog.
  *
- * @description Renders the dialog box centered on screen with overlay.
- * Includes zoom and fade animations, responsive max-width, and proper
- * accessibility attributes. Automatically includes Portal and Overlay.
+ * Renders the dialog box centered on screen with overlay. Includes zoom and
+ * fade animations, responsive max-width, and proper accessibility attributes.
+ * Automatically includes Portal and Overlay.
+ *
+ * @example
+ *   ```tsx
+ *   <AlertDialogContent>
+ *     <AlertDialogHeader>
+ *       <AlertDialogTitle>Confirm Action</AlertDialogTitle>
+ *     </AlertDialogHeader>
+ *     <AlertDialogFooter>
+ *       <AlertDialogCancel>Cancel</AlertDialogCancel>
+ *       <AlertDialogAction>Confirm</AlertDialogAction>
+ *     </AlertDialogFooter>
+ *   </AlertDialogContent>
+ *   ```;
  *
  * @param props - Content props from Radix UI
  * @param props.className - Additional CSS classes
  * @param props.children - Dialog content (header, footer, etc.)
  * @returns React dialog content container
- *
- * @example
- * ```tsx
- * <AlertDialogContent>
- *   <AlertDialogHeader>
- *     <AlertDialogTitle>Confirm Action</AlertDialogTitle>
- *   </AlertDialogHeader>
- *   <AlertDialogFooter>
- *     <AlertDialogCancel>Cancel</AlertDialogCancel>
- *     <AlertDialogAction>Confirm</AlertDialogAction>
- *   </AlertDialogFooter>
- * </AlertDialogContent>
- * ```
  */
 function AlertDialogContent({
   className,
@@ -158,14 +158,14 @@ function AlertDialogContent({
         {...props}
       />
     </AlertDialogPortal>
-  )
+  );
 }
 
 /**
  * Header container for AlertDialog title and description.
  *
- * @description Flex column layout for organizing the dialog's title and
- * description. Text is centered on mobile and left-aligned on larger screens.
+ * Flex column layout for organizing the dialog's title and description. Text is
+ * centered on mobile and left-aligned on larger screens.
  *
  * @param props - Header div props
  * @param props.className - Additional CSS classes
@@ -182,14 +182,14 @@ function AlertDialogHeader({
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Footer container for AlertDialog action buttons.
  *
- * @description Flex layout for action buttons. Stacks vertically (reverse order)
- * on mobile and horizontally (right-aligned) on larger screens.
+ * Flex layout for action buttons. Stacks vertically (reverse order) on mobile
+ * and horizontally (right-aligned) on larger screens.
  *
  * @param props - Footer div props
  * @param props.className - Additional CSS classes
@@ -209,14 +209,14 @@ function AlertDialogFooter({
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Title component for the AlertDialog.
  *
- * @description Renders the main heading for the dialog with large, semibold text.
- * Used for accessibility to announce the dialog purpose to screen readers.
+ * Renders the main heading for the dialog with large, semibold text. Used for
+ * accessibility to announce the dialog purpose to screen readers.
  *
  * @param props - Title props from Radix UI
  * @param props.className - Additional CSS classes
@@ -233,14 +233,14 @@ function AlertDialogTitle({
       className={cn("text-lg font-semibold", className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Description component for the AlertDialog.
  *
- * @description Renders explanatory text below the title with muted styling.
- * Provides additional context about the action being confirmed.
+ * Renders explanatory text below the title with muted styling. Provides
+ * additional context about the action being confirmed.
  *
  * @param props - Description props from Radix UI
  * @param props.className - Additional CSS classes
@@ -257,27 +257,27 @@ function AlertDialogDescription({
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Primary action button for the AlertDialog.
  *
- * @description Renders the confirm/proceed button with default button styling.
- * Clicking this button closes the dialog and should trigger the confirmed action.
+ * Renders the confirm/proceed button with default button styling. Clicking this
+ * button closes the dialog and should trigger the confirmed action.
+ *
+ * @example
+ *   ```tsx
+ *   <AlertDialogAction onClick={handleDelete}>
+ *     Delete Item
+ *   </AlertDialogAction>
+ *   ```;
  *
  * @param props - Action props from Radix UI
  * @param props.className - Additional CSS classes
  * @param props.onClick - Handler for the action (in addition to closing dialog)
  * @param props.children - Button text
  * @returns React button element with primary styling
- *
- * @example
- * ```tsx
- * <AlertDialogAction onClick={handleDelete}>
- *   Delete Item
- * </AlertDialogAction>
- * ```
  */
 function AlertDialogAction({
   className,
@@ -288,24 +288,24 @@ function AlertDialogAction({
       className={cn(buttonVariants(), className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
  * Cancel button for the AlertDialog.
  *
- * @description Renders the cancel/dismiss button with outline button styling.
- * Clicking this button closes the dialog without triggering any action.
+ * Renders the cancel/dismiss button with outline button styling. Clicking this
+ * button closes the dialog without triggering any action.
+ *
+ * @example
+ *   ```tsx
+ *   <AlertDialogCancel>Cancel</AlertDialogCancel>
+ *   ```;
  *
  * @param props - Cancel props from Radix UI
  * @param props.className - Additional CSS classes
  * @param props.children - Button text (typically "Cancel")
  * @returns React button element with outline styling
- *
- * @example
- * ```tsx
- * <AlertDialogCancel>Cancel</AlertDialogCancel>
- * ```
  */
 function AlertDialogCancel({
   className,
@@ -316,7 +316,7 @@ function AlertDialogCancel({
       className={cn(buttonVariants({ variant: "outline" }), className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -331,4 +331,4 @@ export {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-}
+};

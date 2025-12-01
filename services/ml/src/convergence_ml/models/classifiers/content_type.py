@@ -148,7 +148,8 @@ class ContentTypeClassifier(BaseClassifier):
                         n_jobs=-1,  # Parallel processing
                     ),
                 ),
-            ]
+            ],
+            memory=None,  # Can be set to cache transformers for faster retraining
         )
 
     def train(
@@ -214,7 +215,7 @@ class ContentTypeClassifier(BaseClassifier):
         y = self._mlb.fit_transform(labels_list)
 
         # Split data
-        X_train, X_val, y_train, y_val = train_test_split(
+        x_train, x_val, y_train, y_val = train_test_split(
             texts,
             y,
             test_size=validation_split,
@@ -223,22 +224,22 @@ class ContentTypeClassifier(BaseClassifier):
 
         # Create and train pipeline
         self._pipeline = self._create_pipeline()
-        self._pipeline.fit(X_train, y_train)
+        self._pipeline.fit(x_train, y_train)
 
         # Store feature names
         tfidf = self._pipeline.named_steps["tfidf"]
         self._feature_names = tfidf.get_feature_names_out().tolist()
 
         # Evaluate
-        y_pred = self._pipeline.predict(X_val)
+        y_pred = self._pipeline.predict(x_val)
 
         metrics = {
             "accuracy": float(accuracy_score(y_val, y_pred)),
             "f1_micro": float(f1_score(y_val, y_pred, average="micro", zero_division=0)),
             "f1_macro": float(f1_score(y_val, y_pred, average="macro", zero_division=0)),
             "f1_weighted": float(f1_score(y_val, y_pred, average="weighted", zero_division=0)),
-            "train_samples": len(X_train),
-            "val_samples": len(X_val),
+            "train_samples": len(x_train),
+            "val_samples": len(x_val),
             "num_categories": len(self.categories),
         }
 

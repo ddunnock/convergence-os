@@ -270,7 +270,7 @@ function ThemeVariantProvider({
     document.head.appendChild(link);
 
     // Set data-theme attribute for CSS selectors
-    document.documentElement.setAttribute("data-theme", themeVariant);
+    document.documentElement.dataset.theme = themeVariant;
   }, [themeVariant, mounted]);
 
   const setThemeVariant = useCallback((variant: ThemeVariant) => {

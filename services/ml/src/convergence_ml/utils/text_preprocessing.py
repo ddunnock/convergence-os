@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 from convergence_ml.core.logging import get_logger
 
 if TYPE_CHECKING:
-    pass
+    from typing import Any  # noqa: F401 - Used for type checking
 
 logger = get_logger(__name__)
 
@@ -243,9 +243,7 @@ def _chunk_by_sentences(text: str, chunk_size: int, overlap: int) -> list[str]:
     Returns:
         List of chunks.
     """
-    # Simple sentence splitting (for better results, use spaCy)
-    sentences = re.split(r"(?<=[.!?])\s+", text)
-
+    sentences = _split_into_sentences(text)
     if not sentences:
         return [text] if text else []
 
@@ -256,24 +254,10 @@ def _chunk_by_sentences(text: str, chunk_size: int, overlap: int) -> list[str]:
     for sentence in sentences:
         sentence_words = len(sentence.split())
 
-        if current_word_count + sentence_words > chunk_size and current_chunk:
-            # Save current chunk
+        if _should_save_chunk(current_word_count, sentence_words, chunk_size, current_chunk):
+            # Save current chunk and start new one with overlap
             chunks.append(" ".join(current_chunk))
-
-            # Start new chunk with overlap
-            overlap_words = 0
-            overlap_sentences: list[str] = []
-
-            for s in reversed(current_chunk):
-                s_words = len(s.split())
-                if overlap_words + s_words <= overlap:
-                    overlap_sentences.insert(0, s)
-                    overlap_words += s_words
-                else:
-                    break
-
-            current_chunk = overlap_sentences
-            current_word_count = overlap_words
+            current_chunk, current_word_count = _create_overlap_chunk(current_chunk, overlap)
 
         current_chunk.append(sentence)
         current_word_count += sentence_words
@@ -283,6 +267,63 @@ def _chunk_by_sentences(text: str, chunk_size: int, overlap: int) -> list[str]:
         chunks.append(" ".join(current_chunk))
 
     return chunks
+
+
+def _split_into_sentences(text: str) -> list[str]:
+    """Split text into sentences.
+
+    Args:
+        text: Text to split.
+
+    Returns:
+        List of sentences.
+    """
+    # Simple sentence splitting (for better results, use spaCy)
+    return re.split(r"(?<=[.!?])\s+", text)
+
+
+def _should_save_chunk(
+    current_word_count: int,
+    sentence_words: int,
+    chunk_size: int,
+    current_chunk: list[str],
+) -> bool:
+    """Check if current chunk should be saved.
+
+    Args:
+        current_word_count: Current word count in chunk.
+        sentence_words: Words in next sentence.
+        chunk_size: Target chunk size.
+        current_chunk: Current chunk sentences.
+
+    Returns:
+        True if chunk should be saved.
+    """
+    return current_word_count + sentence_words > chunk_size and bool(current_chunk)
+
+
+def _create_overlap_chunk(current_chunk: list[str], overlap: int) -> tuple[list[str], int]:
+    """Create overlap chunk from previous sentences.
+
+    Args:
+        current_chunk: Previous chunk sentences.
+        overlap: Overlap size in words.
+
+    Returns:
+        Tuple of (overlap_sentences, overlap_word_count).
+    """
+    overlap_words = 0
+    overlap_sentences: list[str] = []
+
+    for sentence in reversed(current_chunk):
+        sentence_word_count = len(sentence.split())
+        if overlap_words + sentence_word_count <= overlap:
+            overlap_sentences.insert(0, sentence)
+            overlap_words += sentence_word_count
+        else:
+            break
+
+    return overlap_sentences, overlap_words
 
 
 def remove_stopwords(text: str, custom_stopwords: list[str] | None = None) -> str:

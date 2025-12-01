@@ -154,8 +154,11 @@ def get_embedding_generator() -> EmbeddingGenerator:
     return get_embedding_generator_instance()
 
 
+# Import the actual type for proper FastAPI resolution
+from convergence_ml.models.sentence_transformer import EmbeddingGenerator as _EmbeddingGenerator
+
 EmbeddingGeneratorDep = Annotated[
-    "EmbeddingGenerator",
+    _EmbeddingGenerator,
     Depends(get_embedding_generator),
 ]
 
@@ -194,8 +197,11 @@ def get_embedding_service(
     )
 
 
+# Import the actual type for proper FastAPI resolution
+from convergence_ml.services.embedding_service import EmbeddingService as _EmbeddingService
+
 EmbeddingServiceDep = Annotated[
-    "EmbeddingService",
+    _EmbeddingService,
     Depends(get_embedding_service),
 ]
 
@@ -227,8 +233,13 @@ def get_classification_service(
     return ClassificationService(settings=settings)
 
 
+# Import the actual type for proper FastAPI resolution
+from convergence_ml.services.classification_service import (
+    ClassificationService as _ClassificationService,
+)
+
 ClassificationServiceDep = Annotated[
-    "ClassificationService",
+    _ClassificationService,
     Depends(get_classification_service),
 ]
 
@@ -267,8 +278,11 @@ def get_similarity_service(
     )
 
 
+# Import the actual type for proper FastAPI resolution
+from convergence_ml.services.similarity_service import SimilarityService as _SimilarityService
+
 SimilarityServiceDep = Annotated[
-    "SimilarityService",
+    _SimilarityService,
     Depends(get_similarity_service),
 ]
 
@@ -310,7 +324,10 @@ def get_highlight_service(
     )
 
 
+# Import the actual type for proper FastAPI resolution
+from convergence_ml.services.highlight_service import HighlightService as _HighlightService
+
 HighlightServiceDep = Annotated[
-    "HighlightService",
+    _HighlightService,
     Depends(get_highlight_service),
 ]

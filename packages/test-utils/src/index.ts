@@ -1,12 +1,16 @@
 /**
- * @fileoverview Main exports for @convergence/test-utils package.
- * Provides testing utilities, render wrappers, and re-exports from testing libraries.
  * @module @convergence/test-utils
+ * @file Main exports for @convergence/test-utils package. Provides testing
+ *   utilities, render wrappers, and re-exports from testing libraries.
  */
 
 import * as React from "react";
 import { type ReactElement, type ReactNode } from "react";
-import { render, type RenderOptions, type RenderResult } from "@testing-library/react";
+import {
+  render,
+  type RenderOptions,
+  type RenderResult,
+} from "@testing-library/react";
 
 // Re-export everything from testing libraries
 export * from "@testing-library/react";
@@ -17,9 +21,7 @@ export * from "vitest";
 export * from "./mocks.js";
 export * from "./chaos.js";
 
-/**
- * Options for custom render wrapper.
- */
+/** Options for custom render wrapper. */
 export interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
   /** Custom wrapper components in order of nesting (outermost first) */
   wrappers?: Array<React.ComponentType<{ children: ReactNode }>>;
@@ -28,21 +30,21 @@ export interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {
 /**
  * Creates a combined wrapper from multiple provider components.
  *
- * @description Combines multiple wrapper components into a single wrapper,
- * useful for testing with multiple context providers.
+ * Combines multiple wrapper components into a single wrapper, useful for
+ * testing with multiple context providers.
+ *
+ * @example
+ *   ```typescript
+ *   const CombinedWrapper = createCombinedWrapper([
+ *     ThemeProvider,
+ *     AuthProvider,
+ *     QueryProvider,
+ *   ]);
+ *   render(<Component />, { wrapper: CombinedWrapper });
+ *   ```;
  *
  * @param wrappers - Array of wrapper components, outermost first
  * @returns Combined wrapper component
- *
- * @example
- * ```typescript
- * const CombinedWrapper = createCombinedWrapper([
- *   ThemeProvider,
- *   AuthProvider,
- *   QueryProvider,
- * ]);
- * render(<Component />, { wrapper: CombinedWrapper });
- * ```
  */
 export function createCombinedWrapper(
   wrappers: Array<React.ComponentType<{ children: ReactNode }>>
@@ -58,19 +60,19 @@ export function createCombinedWrapper(
 /**
  * Custom render function with support for multiple wrappers.
  *
- * @description Extends @testing-library/react's render with support
- * for composing multiple wrapper components.
+ * Extends @testing-library/react's render with support for composing multiple
+ * wrapper components.
+ *
+ * @example
+ *   ```typescript
+ *   const { getByText } = customRender(<MyComponent />, {
+ *     wrappers: [ThemeProvider, AuthProvider],
+ *   });
+ *   ```;
  *
  * @param ui - The React element to render
  * @param options - Render options including custom wrappers
  * @returns Render result with query methods
- *
- * @example
- * ```typescript
- * const { getByText } = customRender(<MyComponent />, {
- *   wrappers: [ThemeProvider, AuthProvider],
- * });
- * ```
  */
 export function customRender(
   ui: ReactElement,
@@ -89,20 +91,20 @@ export function customRender(
 /**
  * Creates a test setup helper with preconfigured wrappers.
  *
- * @description Factory function to create a render function with
- * default wrappers already applied, reducing boilerplate in tests.
+ * Factory function to create a render function with default wrappers already
+ * applied, reducing boilerplate in tests.
+ *
+ * @example
+ *   ```typescript
+ *   // In test setup
+ *   const renderWithProviders = createTestSetup([ThemeProvider]);
+ *
+ *   // In tests
+ *   const { getByRole } = renderWithProviders(<Button />);
+ *   ```;
  *
  * @param defaultWrappers - Default wrapper components
  * @returns Custom render function
- *
- * @example
- * ```typescript
- * // In test setup
- * const renderWithProviders = createTestSetup([ThemeProvider]);
- *
- * // In tests
- * const { getByRole } = renderWithProviders(<Button />);
- * ```
  */
 export function createTestSetup(
   defaultWrappers: Array<React.ComponentType<{ children: ReactNode }>>
@@ -117,17 +119,17 @@ export function createTestSetup(
 /**
  * Waits for a condition to be true with timeout.
  *
- * @description Utility for waiting on async state changes in tests.
+ * Utility for waiting on async state changes in tests.
+ *
+ * @example
+ *   ```typescript
+ *   await waitForCondition(() => document.querySelector('.loaded'));
+ *   ```;
  *
  * @param condition - Function that returns true when condition is met
  * @param options - Timeout and interval options
  * @returns Promise that resolves when condition is true
  * @throws Error if timeout is reached
- *
- * @example
- * ```typescript
- * await waitForCondition(() => document.querySelector('.loaded'));
- * ```
  */
 export async function waitForCondition(
   condition: () => boolean | Promise<boolean>,
@@ -148,19 +150,18 @@ export async function waitForCondition(
 /**
  * Creates a mock console that captures and optionally suppresses output.
  *
- * @description Useful for testing error boundaries or components
- * that log errors/warnings.
+ * Useful for testing error boundaries or components that log errors/warnings.
+ *
+ * @example
+ *   ```typescript
+ *   const { errors, restore } = mockConsole({ suppress: true });
+ *   render(<ComponentThatLogErrors />);
+ *   expect(errors).toHaveLength(1);
+ *   restore();
+ *   ```;
  *
  * @param options - Configuration options
  * @returns Object with captured logs and restore function
- *
- * @example
- * ```typescript
- * const { errors, restore } = mockConsole({ suppress: true });
- * render(<ComponentThatLogErrors />);
- * expect(errors).toHaveLength(1);
- * restore();
- * ```
  */
 export function mockConsole(options: { suppress?: boolean } = {}): {
   logs: string[];
@@ -207,23 +208,25 @@ export function mockConsole(options: { suppress?: boolean } = {}): {
 /**
  * Asserts that no accessibility violations exist.
  *
- * @description Simple accessibility check for testing.
- * For comprehensive a11y testing, use axe-core.
+ * Simple accessibility check for testing. For comprehensive a11y testing, use
+ * axe-core.
+ *
+ * @example
+ *   ```typescript
+ *   const { container } = render(<Button>Click me</Button>);
+ *   assertNoA11yViolations(container);
+ *   ```;
  *
  * @param container - DOM container to check
  * @throws Error if accessibility issues are found
- *
- * @example
- * ```typescript
- * const { container } = render(<Button>Click me</Button>);
- * assertNoA11yViolations(container);
- * ```
  */
 export function assertNoA11yViolations(container: HTMLElement): void {
   // Check for images without alt text
   const imagesWithoutAlt = container.querySelectorAll("img:not([alt])");
   if (imagesWithoutAlt.length > 0) {
-    throw new Error(`Found ${imagesWithoutAlt.length} image(s) without alt text`);
+    throw new Error(
+      `Found ${imagesWithoutAlt.length} image(s) without alt text`
+    );
   }
 
   // Check for buttons without accessible names
@@ -240,7 +243,9 @@ export function assertNoA11yViolations(container: HTMLElement): void {
   });
 
   // Check for form inputs without labels
-  const inputs = container.querySelectorAll("input:not([type='hidden']), select, textarea");
+  const inputs = container.querySelectorAll(
+    "input:not([type='hidden']), select, textarea"
+  );
   inputs.forEach((input) => {
     const id = input.getAttribute("id");
     const hasLabel =
@@ -256,11 +261,13 @@ export function assertNoA11yViolations(container: HTMLElement): void {
   });
 
   // Check for proper heading hierarchy
-  const headings = Array.from(container.querySelectorAll("h1, h2, h3, h4, h5, h6"));
+  const headings = Array.from(
+    container.querySelectorAll("h1, h2, h3, h4, h5, h6")
+  );
   let lastLevel = 0;
   headings.forEach((heading) => {
     const levelChar = heading.tagName[1];
-    const level = levelChar ? parseInt(levelChar, 10) : 1;
+    const level = levelChar ? Number.parseInt(levelChar, 10) : 1;
     if (level > lastLevel + 1 && lastLevel !== 0) {
       console.warn(
         `Heading hierarchy skip: h${lastLevel} to h${level}. Consider using proper heading levels.`
