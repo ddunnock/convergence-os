@@ -61,7 +61,8 @@ export async function rapidFire(
  */
 export function randomDelay(minMs: number, maxMs: number): Promise<void> {
   // SECURITY: Math.random() is appropriate for test simulation purposes
-  const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+  // NOSONAR: This is test utility code, not cryptographic use
+  const delay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs; // NOSONAR
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
@@ -280,7 +281,8 @@ export function fuzzer<T>(validValues: T[], count = 50): unknown[] {
 
   for (let i = 0; i < count; i++) {
     // SECURITY: Math.random() is appropriate for fuzzing/testing purposes
-    const randomIndex = Math.floor(Math.random() * generators.length);
+    // NOSONAR: This is test utility code, not cryptographic use
+    const randomIndex = Math.floor(Math.random() * generators.length); // NOSONAR
     const generator = generators[randomIndex];
     if (generator) {
       fuzzedValues.push(generator());
@@ -409,7 +411,9 @@ export function networkFailure(
       }
 
       // SECURITY: Math.random() is appropriate for test simulation purposes
+      // NOSONAR: This is test utility code, not cryptographic use
       if (pattern.test(url) && Math.random() < failureProbability) {
+        // NOSONAR
         if (delayMs > 0) {
           await new Promise((resolve) => setTimeout(resolve, delayMs));
         }
