@@ -1,6 +1,6 @@
 interface StoryCanvasProps {
-  children: React.ReactNode;
-  className?: string;
+  readonly children: React.ReactNode;
+  readonly className?: string;
 }
 
 export function StoryCanvas({ children, className }: StoryCanvasProps) {
