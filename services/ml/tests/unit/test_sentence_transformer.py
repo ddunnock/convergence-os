@@ -304,13 +304,17 @@ def test_embed_with_context_different_weights(mock_sentence_transformer, mock_se
     ):
         generator = EmbeddingGenerator(model=mock_sentence_transformer)
 
-        # Use deterministic embeddings for this test
+        # Use deterministic non-uniform embeddings for this test
+        # Non-uniform vectors are required because uniform vectors normalize
+        # to the same unit vector regardless of scale
         def deterministic_encode(texts, **kwargs):
             # Return different embeddings for focal vs context
             if texts[0] == "focal":
-                return np.array([[1.0] * 384])
+                # Non-uniform: first half 1.0, second half 0.0
+                return np.array([[1.0] * 192 + [0.0] * 192])
             else:
-                return np.array([[0.5] * 384])
+                # Non-uniform: first half 0.0, second half 1.0
+                return np.array([[0.0] * 192 + [1.0] * 192])
 
         mock_sentence_transformer.encode = deterministic_encode
 

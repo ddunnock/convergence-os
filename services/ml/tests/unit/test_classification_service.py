@@ -110,22 +110,22 @@ class TestClassificationService:
         assert classifier is not None
         assert service._content_classifier is not None
 
-    async def test_check_spam_trained(self, service, mock_spam_classifier):
+    def test_check_spam_trained(self, service, mock_spam_classifier):
         """Test spam checking with trained classifier."""
-        result = await service.check_spam("Buy now!")
+        result = service.check_spam("Buy now!")
         assert isinstance(result, SpamResult)
         assert result.label == "ham"
         assert not result.is_spam
         mock_spam_classifier.predict.assert_called_once_with("Buy now!")
 
-    async def test_check_spam_untrained(self):
+    def test_check_spam_untrained(self):
         """Test spam checking with untrained classifier."""
 
         untrained_classifier = Mock()
         untrained_classifier.is_trained = False
         service = ClassificationService(spam_classifier=untrained_classifier)
 
-        result = await service.check_spam("test")
+        result = service.check_spam("test")
         assert result.label == "unknown"
         assert result.confidence == 0.0
         assert not result.is_spam
