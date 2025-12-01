@@ -65,7 +65,7 @@ class ClassificationService:
 
     Example:
         >>> service = ClassificationService()
-        >>> result = await service.classify("Meeting notes from today")
+        >>> result = service.classify("Meeting notes from today")
         >>> print(f"Spam: {result.spam.is_spam if result.spam else 'N/A'}")
         >>> print(f"Categories: {result.categories.labels if result.categories else []}")
     """
@@ -258,7 +258,7 @@ class ClassificationService:
 
         return self.content_classifier.predict_multi_batch(texts)
 
-    async def classify(
+    def classify(
         self,
         text: str,
         check_spam: bool = True,
@@ -277,7 +277,7 @@ class ClassificationService:
             ClassificationResult with all classification results.
 
         Example:
-            >>> result = await service.classify("Buy now! Limited offer!")
+            >>> result = service.classify("Buy now! Limited offer!")
             >>> if result.spam and result.spam.is_spam:
             ...     print("This is spam!")
             >>> if result.categories:
