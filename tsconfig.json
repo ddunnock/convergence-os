@@ -8,6 +8,7 @@
   "exclude": ["node_modules"],
   "references": [
     { "path": "./apps/web" },
+    { "path": "./apps/storybook" },
     { "path": "./packages/ui" },
     { "path": "./tooling/tailwind" },
     { "path": "./tooling/typescript" }

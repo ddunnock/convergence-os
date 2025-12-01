@@ -1,0 +1,2 @@
+/* Import the repo custom styles from the @convergence/tailwind package */
+@import "@convergence/tailwind-config/globals.css";

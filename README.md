@@ -1,11 +1,11 @@
 # ConvergenceOS
 
-<p align="center">
+<div ="center">
   <strong>A Unified Knowledge Workspace</strong><br>
   <em>Bringing together notes, documentation, and communication</em>
-</p>
+</div>
 
-<p align="center">
+<p ="center">
   <a href="#features">Features</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#getting-started">Getting Started</a> •
@@ -15,6 +15,29 @@
 </p>
 
 ---
+
+<div ="center">
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+
+[![AI Code Assurance](https://sonarcloud.io/api/project_badges/ai_code_assurance?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ddunnock_convergence-os)](https://sonarcloud.io/summary/new_code?id=ddunnock_convergence-os)
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-blue.svg)](https://www.typescriptlang.org/)
+[![Tauri](https://img.shields.io/badge/Tauri-2.9.1-24C8D8.svg)](https://tauri.app/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status](<https://img.shields.io/badge/Status-Phase%203%20(42%25)-yellow.svg>)](#current-status)
+
+## </div>
 
 ## Overview
 
@@ -67,7 +90,6 @@ convergence-os/
 ```
 
 ### Technology Stack
-
 
 | Layer           | Technology              | Purpose                                            |
 | --------------- | ----------------------- | -------------------------------------------------- |
@@ -129,7 +151,6 @@ GITHUB_TOKEN=ghp_...
 ## Development
 
 ### Available Scripts
-
 
 | Command          | Description                                 |
 | ---------------- | ------------------------------------------- |
@@ -213,7 +234,7 @@ import { AnthropicProvider } from "@convergence/ai/providers";
 
 const ai = new AnthropicProvider();
 const response = await ai.complete([
-  { role: "user", content: "Summarize this document..." }
+  { role: "user", content: "Summarize this document..." },
 ]);
 
 // Streaming
@@ -233,7 +254,7 @@ import { ConvergenceEditor } from "@convergence/editor";
   content={markdown}
   onChange={setContent}
   placeholder="Start writing..."
-/>
+/>;
 ```
 
 ### `@convergence/ui`
@@ -246,7 +267,7 @@ import { cn } from "@convergence/ui/lib/utils";
 
 <Button variant="outline" className={cn("custom-class")}>
   Click me
-</Button>
+</Button>;
 ```
 
 ## Editor Configuration
@@ -314,47 +335,47 @@ pnpm test:e2e
 
 ### Phase 1: Foundation ✅
 
-- [X]  Monorepo setup with pnpm + Turborepo
-- [X]  TypeScript configurations
-- [X]  Unified document model (Zod schemas)
-- [X]  Database schema (Drizzle + SQLite)
-- [X]  AI provider abstraction
+- [x] Monorepo setup with pnpm + Turborepo
+- [x] TypeScript configurations
+- [x] Unified document model (Zod schemas)
+- [x] Database schema (Drizzle + SQLite)
+- [x] AI provider abstraction
 
 ### Phase 2: Core Editor (In Progress)
 
-- [ ]  Tiptap editor with StarterKit
-- [ ]  WikiLink extension (`[[page]]` syntax)
-- [ ]  Block reference extension (`((block-id))`)
-- [ ]  Full-text search (SQLite FTS5)
-- [ ]  Document sidebar and navigation
+- [ ] Tiptap editor with StarterKit
+- [ ] WikiLink extension (`[[page]]` syntax)
+- [ ] Block reference extension (`((block-id))`)
+- [ ] Full-text search (SQLite FTS5)
+- [ ] Document sidebar and navigation
 
 ### Phase 3: External Documentation
 
-- [ ]  GitHub sync provider
-- [ ]  Markdown/MDX parsing
-- [ ]  RST support (via pandoc)
-- [ ]  Documentation browser
+- [ ] GitHub sync provider
+- [ ] Markdown/MDX parsing
+- [ ] RST support (via pandoc)
+- [ ] Documentation browser
 
 ### Phase 4: Email Integration
 
-- [ ]  IMAP client integration
-- [ ]  Thread view and composition
-- [ ]  Email-to-note linking
-- [ ]  Real-time updates (IMAP IDLE)
+- [ ] IMAP client integration
+- [ ] Thread view and composition
+- [ ] Email-to-note linking
+- [ ] Real-time updates (IMAP IDLE)
 
 ### Phase 5: AI Intelligence
 
-- [ ]  Document summarization
-- [ ]  Semantic search (embeddings)
-- [ ]  Draft generation
-- [ ]  Auto-tagging and suggestions
+- [ ] Document summarization
+- [ ] Semantic search (embeddings)
+- [ ] Draft generation
+- [ ] Auto-tagging and suggestions
 
 ### Phase 6: Polish
 
-- [ ]  Performance optimization
-- [ ]  Desktop app refinement
-- [ ]  Documentation site
-- [ ]  MCP server for external AI tools
+- [ ] Performance optimization
+- [ ] Desktop app refinement
+- [ ] Documentation site
+- [ ] MCP server for external AI tools
 
 ## Contributing
 

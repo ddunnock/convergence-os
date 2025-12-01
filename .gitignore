@@ -72,6 +72,10 @@ ENV/
 # turbo
 .turbo/
 
+# Storybook
+storybook-static/
+*storybook.log
+
 # IDE
 .idea/
 
