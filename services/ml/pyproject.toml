@@ -46,6 +46,9 @@ dev = [
     # Documentation
     "sphinx (>=8.0.0,<9.0.0)",
     "sphinx-autodoc-typehints (>=3.0.0,<4.0.0)",
+    "sphinx-js (>=5.0.0,<6.0.0)",
+    "furo (>=2024.0.0)",
+    "sphinx-design (>=0.5.0,<1.0.0)",
 ]
 gpu = ["torch>=2.6.1"]
 
@@ -61,8 +64,8 @@ build-backend = "poetry.core.masonry.api"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 addopts = """
-    --cov=convergence_ml 
-    --cov-report=term-missing 
+    --cov=convergence_ml
+    --cov-report=term-missing
     --cov-report=xml:coverage.xml
     --cov-report=html
     """
@@ -150,4 +153,5 @@ add_ignore = ["D100", "D104", "D107"]
 [tool.bandit]
 exclude_dirs = ["tests"]
 skips = ["B101"]
+
 

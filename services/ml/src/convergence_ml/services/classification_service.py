@@ -151,7 +151,7 @@ class ClassificationService:
         logger.debug("Creating new content classifier")
         return ContentTypeClassifier()
 
-    async def check_spam(self, text: str) -> SpamResult:
+    def check_spam(self, text: str) -> SpamResult:
         """Check if text is spam.
 
         Args:
@@ -164,7 +164,7 @@ class ClassificationService:
             RuntimeError: If classifier is not trained.
 
         Example:
-            >>> result = await service.check_spam("Free money! Click now!")
+            >>> result = service.check_spam("Free money! Click now!")
             >>> if result.is_spam:
             ...     print(f"Spam detected (score: {result.spam_score:.2f})")
             ...     print(f"Indicators: {result.spam_indicators}")
@@ -291,7 +291,7 @@ class ClassificationService:
         category_result = None
 
         if check_spam:
-            spam_result = await self.check_spam(text)
+            spam_result = self.check_spam(text)
 
         if categorize:
             category_result = await self.categorize(text)

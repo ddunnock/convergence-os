@@ -287,7 +287,7 @@ class SimilarityService:
 
         return similarity
 
-    async def compute_text_similarity(
+    def compute_text_similarity(
         self,
         text1: str,
         text2: str,
@@ -302,7 +302,7 @@ class SimilarityService:
             Similarity score between 0 and 1.
 
         Example:
-            >>> score = await service.compute_text_similarity(
+            >>> score = service.compute_text_similarity(
             ...     "I love dogs",
             ...     "I adore puppies"
             ... )

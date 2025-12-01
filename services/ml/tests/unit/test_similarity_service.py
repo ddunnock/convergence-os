@@ -232,25 +232,25 @@ class TestSimilarityService:
         with pytest.raises(ValueError, match="Document not found: doc-2"):
             await service.compute_similarity("doc-1", "doc-2")
 
-    async def test_compute_text_similarity(self, service, mock_embedding_generator):
+    def test_compute_text_similarity(self, service, mock_embedding_generator):
         """Test computing similarity between two texts."""
         # Return similar vectors
         vec1 = np.array([1.0, 0.0, 0.0])
         vec2 = np.array([0.9, 0.1, 0.0])
         mock_embedding_generator.embed.return_value = np.array([vec1, vec2])
 
-        score = await service.compute_text_similarity("hello", "hi")
+        score = service.compute_text_similarity("hello", "hi")
 
         assert isinstance(score, float)
         assert 0.0 <= score <= 1.0
         mock_embedding_generator.embed.assert_called_once_with(["hello", "hi"])
 
-    async def test_compute_text_similarity_identical(self, service, mock_embedding_generator):
+    def test_compute_text_similarity_identical(self, service, mock_embedding_generator):
         """Test similarity of identical texts."""
         vec = np.array([1.0, 0.5, 0.3])
         mock_embedding_generator.embed.return_value = np.array([vec, vec])
 
-        score = await service.compute_text_similarity("test", "test")
+        score = service.compute_text_similarity("test", "test")
 
         assert score == pytest.approx(1.0, abs=0.01)
 

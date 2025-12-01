@@ -64,7 +64,7 @@ async def check_spam(
     )
 
     try:
-        result = await service.check_spam(request.text)
+        result = service.check_spam(request.text)
 
         return SpamCheckResponse(
             success=True,

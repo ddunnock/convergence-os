@@ -11,11 +11,9 @@ Example:
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Generic, TypeVar
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
-
-T = TypeVar("T")
 
 
 class BaseRequest(BaseModel):
@@ -120,7 +118,7 @@ class ErrorResponse(BaseModel):
     )
 
 
-class PaginatedResponse(BaseResponse, Generic[T]):  # noqa: UP046
+class PaginatedResponse[T](BaseResponse):
     """Generic paginated response model.
 
     Used for endpoints that return lists with pagination.

@@ -1,29 +1,28 @@
 /**
- * @fileoverview Badge component for displaying labels, status indicators, and tags.
- * Provides a flexible badge component with multiple variants using class-variance-authority
- * for styling and Radix UI Slot for composition.
  * @module @convergence/ui/components/ui/badge
+ * @file Badge component for displaying labels, status indicators, and tags.
+ *   Provides a flexible badge component with multiple variants using
+ *   class-variance-authority for styling and Radix UI Slot for composition.
  */
 
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 /**
  * Creates badge variant styles using class-variance-authority.
  *
- * @description Defines all available badge variants with their corresponding
- * Tailwind CSS classes. Includes focus, hover, and accessibility states.
- *
- * @returns CVA function for generating badge class names
+ * Defines all available badge variants with their corresponding Tailwind CSS
+ * classes. Includes focus, hover, and accessibility states.
  *
  * @example
- * ```typescript
- * const classes = badgeVariants({ variant: "default" });
- * ```
+ *   ```typescript
+ *   const classes = badgeVariants({ variant: "default" });
+ *   ```;
  *
+ * @returns CVA function for generating badge class names
  * @see {@link https://cva.style/docs class-variance-authority}
  */
 const badgeVariants = cva(
@@ -45,50 +44,52 @@ const badgeVariants = cva(
       variant: "default",
     },
   }
-)
+);
 
 /**
  * Props for the Badge component.
  *
  * Extends React span props and variant props from badgeVariants.
  *
- * @property {boolean} [asChild=false] - If true, the component will render its child as a badge.
+ * @property {boolean} [asChild=false] - If true, the component will render its
+ *   child as a badge. Default is `false`
  */
 export interface BadgeProps
-  extends React.ComponentProps<"span">,
-    VariantProps<typeof badgeVariants> {
-  asChild?: boolean
+  extends React.ComponentProps<"span">, VariantProps<typeof badgeVariants> {
+  asChild?: boolean;
 }
 
 /**
  * Renders a customizable badge component.
  *
- * @description This component supports various visual styles and can render as a child component.
- * Commonly used for labels, status indicators, tags, and notifications.
+ * This component supports various visual styles and can render as a child
+ * component. Commonly used for labels, status indicators, tags, and
+ * notifications.
+ *
+ * @example
+ *   ```tsx
+ *   <Badge>New</Badge>
+ *   <Badge variant="secondary">Draft</Badge>
+ *   <Badge variant="destructive">Error</Badge>
+ *   <Badge variant="outline">Tag</Badge>
+ *   ```;
+ *
+ * @example
+ *   ```tsx
+ *   <Badge asChild>
+ *     <Link href="/tags/react">React</Link>
+ *   </Badge>
+ *   ```;
  *
  * @param props - The properties for the Badge component
  * @param props.className - Additional CSS classes to apply to the badge
- * @param props.variant - The visual style of the badge (default, secondary, destructive, outline)
- * @param props.asChild - If true, the component will render its child as a badge
+ * @param props.variant - The visual style of the badge (default, secondary,
+ *   destructive, outline)
+ * @param props.asChild - If true, the component will render its child as a
+ *   badge
  * @param props.children - Badge content (text, icons, etc.)
  * @param props... - All other standard span HTML attributes
  * @returns {JSX.Element} The rendered badge component
- *
- * @example
- * ```tsx
- * <Badge>New</Badge>
- * <Badge variant="secondary">Draft</Badge>
- * <Badge variant="destructive">Error</Badge>
- * <Badge variant="outline">Tag</Badge>
- * ```
- *
- * @example
- * ```tsx
- * <Badge asChild>
- *   <Link href="/tags/react">React</Link>
- * </Badge>
- * ```
- *
  * @see badgeVariants
  */
 function Badge({
@@ -96,8 +97,8 @@ function Badge({
   variant,
   asChild = false,
   ...props
-}: BadgeProps) {
-  const Comp = asChild ? Slot : "span"
+}: Readonly<BadgeProps>) {
+  const Comp = asChild ? Slot : "span";
 
   return (
     <Comp
@@ -105,7 +106,7 @@ function Badge({
       className={cn(badgeVariants({ variant }), className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Badge, badgeVariants }
+export { Badge, badgeVariants };
