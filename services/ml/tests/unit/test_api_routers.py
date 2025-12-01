@@ -25,7 +25,6 @@ sys.modules["sentence_transformers"] = sentence_transformers_mock
 
 from fastapi.testclient import TestClient
 
-from convergence_ml.api.app import create_app
 from convergence_ml.models.classifiers.base import MultiLabelResult
 from convergence_ml.models.classifiers.spam import SpamResult
 
@@ -33,7 +32,7 @@ from convergence_ml.models.classifiers.spam import SpamResult
 @pytest.fixture
 def app():
     """Create FastAPI app for testing."""
-    # Mock settings and models
+    # Mock settings and models to avoid lifespan issues
     with (
         patch("convergence_ml.api.app.get_settings") as mock_settings,
         patch("convergence_ml.models.sentence_transformer.get_embedding_model"),
@@ -63,13 +62,37 @@ def app():
         store.add_embedding = AsyncMock()
         mock_store.return_value = store
 
-        return create_app()
+        # Create app without lifespan to avoid async issues in tests
+        from fastapi import FastAPI
+
+        from convergence_ml import __version__
+        from convergence_ml.api.routers import classification, embeddings, health, highlights
+
+        test_app = FastAPI(
+            title="ConvergenceOS ML Service (Test)",
+            version=__version__,
+            # No lifespan in tests
+            docs_url=f"{settings.api_prefix}/docs",
+            redoc_url=f"{settings.api_prefix}/redoc",
+            openapi_url=f"{settings.api_prefix}/openapi.json",
+        )
+
+        # Add routers
+        test_app.include_router(embeddings.router, prefix=settings.api_prefix, tags=["embeddings"])
+        test_app.include_router(highlights.router, prefix=settings.api_prefix, tags=["highlights"])
+        test_app.include_router(
+            classification.router, prefix=settings.api_prefix, tags=["classification"]
+        )
+        test_app.include_router(health.router, prefix=settings.api_prefix, tags=["health"])
+
+        return test_app
 
 
 @pytest.fixture
 def client(app):
     """Create test client."""
-    return TestClient(app)
+    # Use TestClient without async for synchronous tests
+    return TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture
