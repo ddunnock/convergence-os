@@ -42,7 +42,9 @@
     "ml:models:list": "cd services/ml && poetry run convergence-ml models list",
     "ml:install": "cd services/ml && poetry install",
     "ml:install:dev": "cd services/ml && poetry install --with dev",
-    "ml:install:gpu": "cd services/ml && poetry install --with gpu"
+    "ml:install:gpu": "cd services/ml && poetry install --with gpu",
+    "build:storybook": "turbo build:storybook --filter=@convergence/storybook",
+    "storybook": "pnpm --filter @convergence/storybook storybook"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",

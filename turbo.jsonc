@@ -141,6 +141,12 @@
     },
     "ml:models:list": {
       "cache": false
+    },
+
+    // Storybook build
+    "build:storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
     }
   }
 }

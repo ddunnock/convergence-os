@@ -8,4 +8,13 @@ import storybookPlugin from "eslint-plugin-storybook";
 export default [
   ...nextjsConfig,
   ...storybookPlugin.configs["flat/recommended"],
+  {
+    files: ["**/*.stories.{ts,tsx,js,jsx}", "**/stories/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "jsdoc/require-jsdoc": "off",
+      "jsdoc/require-description": "off",
+      "jsdoc/require-param": "off",
+      "jsdoc/require-returns": "off",
+    },
+  },
 ];

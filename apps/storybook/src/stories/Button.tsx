@@ -13,17 +13,7 @@ export interface ButtonProps {
   onClick?: () => void;
 }
 
-/**
- * Primary UI component for user interaction.
- *
- * @param props - Button component props
- * @param props.primary - Whether this is the principal call to action
- * @param props.size - How large the button should be
- * @param props.backgroundColor - Background color override
- * @param props.label - Button text content
- * @param props.onClick - Optional click handler
- * @returns The rendered button component
- */
+/** Primary UI component for user interaction */
 export const Button = ({
   primary = false,
   size = "medium",
