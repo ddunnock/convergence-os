@@ -165,7 +165,7 @@ async def classify_content(
     )
 
     try:
-        result = await service.classify(
+        result = service.classify(
             text=request.text,
             check_spam=request.check_spam,
             categorize=request.categorize,

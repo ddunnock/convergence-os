@@ -181,29 +181,29 @@ class TestClassificationService:
         assert len(results) == 2
         assert all(r.labels == [] for r in results)
 
-    async def test_classify_full(self, service):
+    def test_classify_full(self, service):
         """Test full classification with both spam and categories."""
-        result = await service.classify("Meeting tomorrow", check_spam=True, categorize=True)
+        result = service.classify("Meeting tomorrow", check_spam=True, categorize=True)
         assert isinstance(result, ClassificationResult)
         assert result.spam is not None
         assert result.categories is not None
         assert result.processing_time_ms > 0
 
-    async def test_classify_spam_only(self, service):
+    def test_classify_spam_only(self, service):
         """Test classification with spam only."""
-        result = await service.classify("Test", check_spam=True, categorize=False)
+        result = service.classify("Test", check_spam=True, categorize=False)
         assert result.spam is not None
         assert result.categories is None
 
-    async def test_classify_categories_only(self, service):
+    def test_classify_categories_only(self, service):
         """Test classification with categories only."""
-        result = await service.classify("Test", check_spam=False, categorize=True)
+        result = service.classify("Test", check_spam=False, categorize=True)
         assert result.spam is None
         assert result.categories is not None
 
-    async def test_classify_with_document_id(self, service):
+    def test_classify_with_document_id(self, service):
         """Test classification with document ID."""
-        result = await service.classify("Test", document_id="doc-123")
+        result = service.classify("Test", document_id="doc-123")
         assert result.document_id == "doc-123"
 
     def test_train_spam_classifier(self, service, mock_spam_classifier):
