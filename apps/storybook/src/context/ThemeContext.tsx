@@ -1,0 +1,46 @@
+import { createContext, useContext, useState, ReactNode } from "react";
+
+type Theme = "light" | "dark";
+
+interface ThemeContextValue {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}
+
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+/**
+ * Provider component that wraps children with theme context. Sets a data-theme
+ * attribute on a wrapper div for CSS variable theming.
+ *
+ * @param props - The provider props.
+ * @param props.children - Child components to wrap.
+ * @returns The provider component with themed wrapper.
+ */
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>("light");
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <div data-theme={theme}>{children}</div>
+    </ThemeContext.Provider>
+  );
+}
+
+/**
+ * Hook to access the current theme and theme setter. Must be used within a
+ * ThemeProvider.
+ *
+ * @returns The current theme and setter function.
+ */
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within ThemeProvider");
+  }
+  return context;
+}

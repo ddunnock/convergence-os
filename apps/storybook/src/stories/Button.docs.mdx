@@ -1,0 +1,59 @@
+import { Canvas, Meta, ArgTypes } from "@storybook/addon-docs/blocks";
+import { PageTitle, StoryCanvas } from "./helpers";
+import { Button } from "./Button";
+import * as ButtonStories from "./Button.stories";
+
+<Meta of={ButtonStories} />
+
+<PageTitle title="Button" src="@convergence/ui/Button" />
+
+The Button component is the primary interactive element for user actions.
+
+## Usage
+
+```tsx
+import { Button } from "@convergence/ui";
+
+<Button primary label="Click me" onClick={() => {}} />;
+```
+
+## Variants
+
+### Primary Button
+
+Use for primary actions like form submissions.
+
+<Canvas of={ButtonStories.Primary} />
+
+### Secondary Button
+
+Use for secondary actions.
+
+<Canvas of={ButtonStories.Secondary} />
+
+### Sizes
+
+Buttons come in three sizes: small, medium, and large.
+
+<Canvas of={ButtonStories.Large} />
+<Canvas of={ButtonStories.Small} />
+
+## Props
+
+<ArgTypes of={Button} />
+
+## Theming
+
+The Button uses CSS custom properties for theming:
+
+| Variable          | Description      |
+| ----------------- | ---------------- |
+| `--button-bg`     | Background color |
+| `--button-text`   | Text color       |
+| `--button-border` | Border color     |
+
+## Accessibility
+
+- Always provide a descriptive `label`
+- Use `aria-label` for icon-only buttons
+- Ensure sufficient color contrast
