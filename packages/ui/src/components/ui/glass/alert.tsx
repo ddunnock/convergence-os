@@ -85,10 +85,7 @@ export interface AlertProps extends React.ComponentProps<typeof BaseAlert> {
  * @see {@link https://www.radix-ui.com/primitives/docs/components/alert Radix Alert}
  */
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  (
-    { className, variant = "glass", glow = false, hover = "none", ...props },
-    ref
-  ) => {
+  ({ className, variant, glow = false, hover = "none", ...props }, ref) => {
     return (
       <BaseAlert
         ref={ref}

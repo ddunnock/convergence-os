@@ -93,11 +93,10 @@ export interface AlertDialogContentProps extends React.ComponentProps<
 export const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof BaseAlertDialogContent>,
   AlertDialogContentProps
->(({ className, variant = "glass", animated = true, ...props }, ref) => {
+>(({ className, animated = true, ...props }, ref) => {
   return (
     <BaseAlertDialogContent
       ref={ref}
-      variant={variant}
       className={cn(animated && "backdrop-blur-[var(--blur-lg)]", className)}
       {...props}
     />
