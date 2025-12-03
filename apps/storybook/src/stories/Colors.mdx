@@ -1,0 +1,150 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { ColorSwatchGroup } from "./helpers/ColorSwatch";
+import { PageTitle } from "./helpers/PageTitle";
+
+<Meta title="Colors" />
+
+<PageTitle title="Colors" src="styles/themes.css" />
+
+_Click on any color swatch to copy its value to your clipboard._
+
+### Primary Accent Colors
+
+<ColorSwatchGroup
+  title="Primary"
+  colors={[
+    { name: "Primary", color: "#7c3aed", textColor: "white" },
+    { name: "Light", color: "#a78bfa", textColor: "white" },
+    { name: "Dark", color: "#5b21b6", textColor: "white" },
+  ]}
+  size="lg"
+/>
+
+### Gradient Colors
+
+These colors are used in the animated orb backgrounds and button gradients.
+
+<div className="space-y-6">
+  <ColorSwatchGroup
+    title="Light Mode Orbs (Pastel)"
+    colors={[
+      { name: "Orb 1", color: "#c7d2fe", textColor: "#1e1b4b" },
+      { name: "Orb 2", color: "#ddd6fe", textColor: "#1e1b4b" },
+      { name: "Orb 3", color: "#bfdbfe", textColor: "#1e1b4b" },
+    ]}
+  />
+  <ColorSwatchGroup
+    title="Dark Mode Orbs (Vibrant)"
+    colors={[
+      { name: "Orb 1", color: "#6366f1", textColor: "white" },
+      { name: "Orb 2", color: "#a855f7", textColor: "white" },
+      { name: "Orb 3", color: "#3b82f6", textColor: "white" },
+    ]}
+  />
+</div>
+
+### Semantic Colors
+
+<div className="space-y-6">
+  <ColorSwatchGroup
+    title="Success"
+    colors={[
+      { name: "Success", color: "#22c55e", textColor: "white" },
+      { name: "Light", color: "#86efac", textColor: "#14532d" },
+      { name: "Dark", color: "#15803d", textColor: "white" },
+    ]}
+  />
+  <ColorSwatchGroup
+    title="Warning"
+    colors={[
+      { name: "Warning", color: "#f59e0b", textColor: "white" },
+      { name: "Light", color: "#fcd34d", textColor: "#78350f" },
+      { name: "Dark", color: "#b45309", textColor: "white" },
+    ]}
+  />
+  <ColorSwatchGroup
+    title="Destructive (Pink)"
+    colors={[
+      { name: "Destructive", color: "#ec4899", textColor: "white" },
+      { name: "Light", color: "#f9a8d4", textColor: "#831843" },
+      { name: "Dark", color: "#be185d", textColor: "white" },
+    ]}
+  />
+</div>
+
+### Background Colors
+
+<div className="space-y-6">
+  <ColorSwatchGroup
+    title="Light Mode Backgrounds"
+    colors={[
+      { name: "Start", color: "#f0f4ff", textColor: "#1e1b4b" },
+      { name: "Mid", color: "#e8eeff", textColor: "#1e1b4b" },
+      { name: "End", color: "#f2f6ff", textColor: "#1e1b4b" },
+    ]}
+  />
+  <ColorSwatchGroup
+    title="Dark Mode Backgrounds"
+    colors={[
+      { name: "Start", color: "#0f1419", textColor: "white" },
+      { name: "Mid", color: "#1a1f35", textColor: "white" },
+      { name: "End", color: "#0f1922", textColor: "white" },
+    ]}
+  />
+</div>
+
+### Glass Effects
+
+<div className="space-y-6">
+  <ColorSwatchGroup
+    title="Glass Surfaces (Light Mode)"
+    colors={[
+      { name: "Glass", color: "rgba(255,255,255,0.7)", textColor: "#1e1b4b" },
+      { name: "Strong", color: "rgba(255,255,255,0.85)", textColor: "#1e1b4b" },
+      { name: "Border", color: "rgba(240,240,255,0.5)", textColor: "#1e1b4b" },
+    ]}
+  />
+  <ColorSwatchGroup
+    title="Glass Surfaces (Dark Mode)"
+    colors={[
+      { name: "Glass", color: "rgba(30,30,50,0.7)", textColor: "white" },
+      { name: "Strong", color: "rgba(40,40,60,0.85)", textColor: "white" },
+      { name: "Border", color: "rgba(60,60,90,0.5)", textColor: "white" },
+    ]}
+  />
+</div>
+
+### Neutral Colors
+
+<ColorSwatchGroup
+  title="Slate Scale"
+  colors={[
+    { name: "50", color: "#f8fafc", textColor: "#0f172a" },
+    { name: "100", color: "#f1f5f9", textColor: "#0f172a" },
+    { name: "200", color: "#e2e8f0", textColor: "#0f172a" },
+    { name: "300", color: "#cbd5e1", textColor: "#0f172a" },
+    { name: "400", color: "#94a3b8", textColor: "#0f172a" },
+    { name: "500", color: "#64748b", textColor: "white" },
+    { name: "600", color: "#475569", textColor: "white" },
+    { name: "700", color: "#334155", textColor: "white" },
+    { name: "800", color: "#1e293b", textColor: "white" },
+    { name: "900", color: "#0f172a", textColor: "white" },
+  ]}
+  size="sm"
+/>
+
+<style>
+  {`
+  .sbdocs-content {
+    max-width: 1000px;
+  }
+
+  h3 {
+    margin-top: 2rem;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+  `}
+</style>

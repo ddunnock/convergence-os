@@ -1,6 +1,6 @@
 interface PageTitleProps {
-  title: string;
-  src?: string;
+  readonly title: string;
+  readonly src?: string;
 }
 
 export function PageTitle({ title, src }: PageTitleProps) {

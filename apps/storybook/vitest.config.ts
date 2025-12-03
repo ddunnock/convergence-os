@@ -29,7 +29,8 @@ export default defineConfig({
       exclude: [
         "src/**/*.stories.{ts,tsx}",
         "src/**/*.test.{ts,tsx}",
-        "src/stories/**",
+        "src/stories/*.mdx",
+        "src/stories/helpers/**",
       ],
     },
     projects: [

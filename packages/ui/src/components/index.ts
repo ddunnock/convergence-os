@@ -22,3 +22,4 @@ export {
 export { AspectRatio } from "./ui/aspect-ratio";
 export { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 export { Badge, badgeVariants } from "./ui/badge";
+export { Button, buttonVariants } from "./ui/button";

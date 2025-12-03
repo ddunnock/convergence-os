@@ -1,6 +1,6 @@
 /**
- * @fileoverview Test setup for @convergence/ui package.
- * Configures global mocks and cleanup for React component tests.
+ * @file Test setup for @convergence/ui package. Configures global mocks and
+ *   cleanup for React component tests.
  */
 
 import "@testing-library/jest-dom";
@@ -69,6 +69,9 @@ beforeAll(() => {
 
   // Mock scrollIntoView
   Element.prototype.scrollIntoView = vi.fn();
+
+  // Mock scrollTo (for code-block auto-scroll)
+  Element.prototype.scrollTo = vi.fn();
 
   // Mock document methods for dynamic link injection
   const originalCreateElement = document.createElement.bind(document);

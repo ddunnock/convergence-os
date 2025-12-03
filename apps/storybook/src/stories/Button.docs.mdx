@@ -1,59 +1,80 @@
 import { Canvas, Meta, ArgTypes } from "@storybook/addon-docs/blocks";
-import { PageTitle, StoryCanvas } from "./helpers";
-import { Button } from "./Button";
+import { PageTitle } from "./helpers";
+import { Button } from "@convergence/ui/components";
 import * as ButtonStories from "./Button.stories";
 
 <Meta of={ButtonStories} />
 
-<PageTitle title="Button" src="@convergence/ui/Button" />
+<PageTitle title="Button" src="@convergence/ui/components/ui/button.tsx" />
 
 The Button component is the primary interactive element for user actions.
 
 ## Usage
 
 ```tsx
-import { Button } from "@convergence/ui";
+import { Button } from "@convergence/ui/components";
 
-<Button primary label="Click me" onClick={() => {}} />;
+<Button variant="default">Click me</Button>
+<Button variant="destructive">Delete</Button>
+<Button variant="outline" size="sm">Small Outline</Button>
 ```
 
 ## Variants
 
-### Primary Button
+### Default
 
-Use for primary actions like form submissions.
+The primary call to action.
 
-<Canvas of={ButtonStories.Primary} />
+<Canvas of={ButtonStories.Default} />
 
-### Secondary Button
+### Destructive
 
-Use for secondary actions.
+For dangerous actions like delete.
+
+<Canvas of={ButtonStories.Destructive} />
+
+### Outline
+
+Secondary actions with a border.
+
+<Canvas of={ButtonStories.Outline} />
+
+### Secondary
+
+Alternative styling for secondary actions.
 
 <Canvas of={ButtonStories.Secondary} />
 
-### Sizes
+### Ghost
 
-Buttons come in three sizes: small, medium, and large.
+Minimal styling, appears on hover.
 
-<Canvas of={ButtonStories.Large} />
+<Canvas of={ButtonStories.Ghost} />
+
+### Link
+
+Styled as a text link.
+
+<Canvas of={ButtonStories.Link} />
+
+## Sizes
+
 <Canvas of={ButtonStories.Small} />
+<Canvas of={ButtonStories.Large} />
+
+## States
+
+### Disabled
+
+<Canvas of={ButtonStories.Disabled} />
 
 ## Props
 
 <ArgTypes of={Button} />
 
-## Theming
-
-The Button uses CSS custom properties for theming:
-
-| Variable          | Description      |
-| ----------------- | ---------------- |
-| `--button-bg`     | Background color |
-| `--button-text`   | Text color       |
-| `--button-border` | Border color     |
-
 ## Accessibility
 
-- Always provide a descriptive `label`
+- Use clear, descriptive text for button content
 - Use `aria-label` for icon-only buttons
-- Ensure sufficient color contrast
+- Ensure sufficient color contrast between variants
+- The component includes proper focus states for keyboard navigation

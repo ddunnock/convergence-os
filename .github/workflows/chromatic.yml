@@ -1,0 +1,66 @@
+# .github/workflows/chromatic.yml
+# Chromatic Visual Testing for Storybook Components
+#
+# This workflow publishes Storybook to Chromatic for visual regression testing:
+# - Runs after CI Pipeline completes successfully on main/develop
+# - Can be manually triggered via workflow_dispatch
+# - Skips Dependabot PRs to save on Chromatic snapshots
+#
+# Required Secrets:
+# - CHROMATIC_PROJECT_TOKEN: Chromatic project token
+
+name: Chromatic Visual Testing
+
+on:
+  # Run after CI Pipeline completes successfully
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches: [main, develop]
+  # Allow manual triggers
+  workflow_dispatch:
+
+# Cancel in-progress runs when a new push occurs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Publish to Chromatic
+    runs-on: ubuntu-latest
+    # Only run if CI Pipeline succeeded (or manual trigger)
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "25"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          buildScriptName: build-storybook
+          onlyChanged: true
+          exitOnceUploaded: true
+          skip: "dependabot/**"
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096

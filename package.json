@@ -43,8 +43,9 @@
     "ml:install": "cd services/ml && poetry install",
     "ml:install:dev": "cd services/ml && poetry install --with dev",
     "ml:install:gpu": "cd services/ml && poetry install --with gpu",
-    "build:storybook": "turbo build:storybook --filter=@convergence/storybook",
-    "storybook": "pnpm --filter @convergence/storybook storybook"
+    "build-storybook": "pnpm --filter @convergence/storybook build:storybook",
+    "storybook": "pnpm --filter @convergence/storybook storybook",
+    "chromatic": "npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
