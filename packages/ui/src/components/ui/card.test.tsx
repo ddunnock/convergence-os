@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for Card component system.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Card component system. Includes unit, edge
+ *   case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -27,13 +27,13 @@ describe("Card", () => {
       const { container } = render(<Card>Card content</Card>);
       const card = container.querySelector('[data-slot="card"]');
       expect(card).toBeInTheDocument();
-      expect(card).toHaveClass("bg-card", "text-card-foreground");
+      expect(card?.className).toContain("bg-card/80");
+      expect(card?.className).toContain("backdrop-blur");
+      expect(card?.className).toContain("text-card-foreground");
     });
 
     it("CardHeader renders correctly", () => {
-      const { container } = render(
-        <CardHeader>Header content</CardHeader>
-      );
+      const { container } = render(<CardHeader>Header content</CardHeader>);
       const header = container.querySelector('[data-slot="card-header"]');
       expect(header).toBeInTheDocument();
       expect(header).toHaveTextContent("Header content");
@@ -51,7 +51,9 @@ describe("Card", () => {
       const { container } = render(
         <CardDescription>Description text</CardDescription>
       );
-      const description = container.querySelector('[data-slot="card-description"]');
+      const description = container.querySelector(
+        '[data-slot="card-description"]'
+      );
       expect(description).toBeInTheDocument();
       expect(description).toHaveClass("text-muted-foreground", "text-sm");
       expect(description).toHaveTextContent("Description text");
@@ -91,21 +93,33 @@ describe("Card", () => {
         <Card className="custom-card">
           <CardHeader className="custom-header">
             <CardTitle className="custom-title">Title</CardTitle>
-            <CardDescription className="custom-description">Desc</CardDescription>
+            <CardDescription className="custom-description">
+              Desc
+            </CardDescription>
           </CardHeader>
           <CardContent className="custom-content">Content</CardContent>
           <CardFooter className="custom-footer">Footer</CardFooter>
         </Card>
       );
 
-      expect(container.querySelector('[data-slot="card"]')).toHaveClass("custom-card");
-      expect(container.querySelector('[data-slot="card-header"]')).toHaveClass("custom-header");
-      expect(container.querySelector('[data-slot="card-title"]')).toHaveClass("custom-title");
-      expect(container.querySelector('[data-slot="card-description"]')).toHaveClass(
-        "custom-description"
+      expect(container.querySelector('[data-slot="card"]')).toHaveClass(
+        "custom-card"
       );
-      expect(container.querySelector('[data-slot="card-content"]')).toHaveClass("custom-content");
-      expect(container.querySelector('[data-slot="card-footer"]')).toHaveClass("custom-footer");
+      expect(container.querySelector('[data-slot="card-header"]')).toHaveClass(
+        "custom-header"
+      );
+      expect(container.querySelector('[data-slot="card-title"]')).toHaveClass(
+        "custom-title"
+      );
+      expect(
+        container.querySelector('[data-slot="card-description"]')
+      ).toHaveClass("custom-description");
+      expect(container.querySelector('[data-slot="card-content"]')).toHaveClass(
+        "custom-content"
+      );
+      expect(container.querySelector('[data-slot="card-footer"]')).toHaveClass(
+        "custom-footer"
+      );
     });
 
     it("all components apply data-slot attributes", () => {
@@ -122,12 +136,24 @@ describe("Card", () => {
       );
 
       expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-header"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-title"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-description"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-action"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-content"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-footer"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-header"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-title"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-description"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-action"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-content"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-footer"]')
+      ).toBeInTheDocument();
     });
   });
 
@@ -145,7 +171,9 @@ describe("Card", () => {
         </Card>
       );
       expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-content"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-content"]')
+      ).toBeInTheDocument();
     });
 
     it("handles very long content", () => {
@@ -201,16 +229,24 @@ describe("Card", () => {
           <CardFooter>Footer</CardFooter>
         </>
       );
-      expect(container.querySelector('[data-slot="card-header"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-content"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-footer"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-header"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-content"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-footer"]')
+      ).toBeInTheDocument();
     });
   });
 
   describe("Security Tests", () => {
     it("prevents XSS in className", () => {
       const maliciousClass = '<script>alert("xss")</script>';
-      const { container } = render(<Card className={maliciousClass}>Test</Card>);
+      const { container } = render(
+        <Card className={maliciousClass}>Test</Card>
+      );
       const card = container.querySelector('[data-slot="card"]');
       // className is set as-is by React (it's just a CSS class, not executable code)
       // The important thing is that it doesn't execute as JavaScript
@@ -310,9 +346,7 @@ describe("Card", () => {
         }
         return (
           <Card>
-            <CardContent>
-              {createNestedCard(depth - 1)}
-            </CardContent>
+            <CardContent>{createNestedCard(depth - 1)}</CardContent>
           </Card>
         );
       };
@@ -432,12 +466,24 @@ describe("Card", () => {
       );
 
       expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-header"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-title"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-description"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-action"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-content"]')).toBeInTheDocument();
-      expect(container.querySelector('[data-slot="card-footer"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-header"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-title"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-description"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-action"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-content"]')
+      ).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="card-footer"]')
+      ).toBeInTheDocument();
     });
 
     it("works with Button components", () => {
@@ -452,8 +498,12 @@ describe("Card", () => {
 
       const buttons = container.querySelectorAll("button");
       expect(buttons).toHaveLength(2);
-      expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Cancel" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Submit" })
+      ).toBeInTheDocument();
     });
 
     it("works with responsive layouts", () => {
@@ -512,4 +562,3 @@ describe("Card", () => {
     });
   });
 });
-

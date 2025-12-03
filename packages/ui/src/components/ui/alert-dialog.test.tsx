@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for AlertDialog component.
- * Includes unit, accessibility, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for AlertDialog component. Includes unit,
+ *   accessibility, edge case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -21,6 +21,7 @@ import { raceConditionTester } from "@convergence/test-utils";
 
 /**
  * Test helper component for AlertDialog with configurable handlers.
+ *
  * @param props - Component props
  * @param props.onAction - Handler for action button click
  * @param props.onCancel - Handler for cancel button click
@@ -142,7 +143,9 @@ describe("AlertDialog", () => {
 
       await waitFor(() => {
         expect(screen.getByText("Are you sure?")).toBeInTheDocument();
-        expect(screen.getByText("This action cannot be undone.")).toBeInTheDocument();
+        expect(
+          screen.getByText("This action cannot be undone.")
+        ).toBeInTheDocument();
       });
     });
 
@@ -154,8 +157,12 @@ describe("AlertDialog", () => {
       });
 
       const dialog = screen.getByRole("alertdialog");
-      expect(dialog.querySelector('[data-slot="alert-dialog-header"]')).toBeInTheDocument();
-      expect(dialog.querySelector('[data-slot="alert-dialog-footer"]')).toBeInTheDocument();
+      expect(
+        dialog.querySelector('[data-slot="alert-dialog-header"]')
+      ).toBeInTheDocument();
+      expect(
+        dialog.querySelector('[data-slot="alert-dialog-footer"]')
+      ).toBeInTheDocument();
     });
 
     it("has data-slot attributes", async () => {
@@ -165,7 +172,10 @@ describe("AlertDialog", () => {
         expect(screen.getByRole("alertdialog")).toBeInTheDocument();
       });
 
-      expect(screen.getByRole("alertdialog")).toHaveAttribute("data-slot", "alert-dialog-content");
+      expect(screen.getByRole("alertdialog")).toHaveAttribute(
+        "data-slot",
+        "alert-dialog-content"
+      );
     });
   });
 
@@ -174,7 +184,9 @@ describe("AlertDialog", () => {
       render(<TestAlertDialog defaultOpen />);
 
       await waitFor(() => {
-        const overlay = document.querySelector('[data-slot="alert-dialog-overlay"]');
+        const overlay = document.querySelector(
+          '[data-slot="alert-dialog-overlay"]'
+        );
         expect(overlay).toBeInTheDocument();
       });
     });
@@ -183,10 +195,13 @@ describe("AlertDialog", () => {
       render(<TestAlertDialog defaultOpen />);
 
       await waitFor(() => {
-        const overlay = document.querySelector('[data-slot="alert-dialog-overlay"]');
-        expect(overlay).toHaveClass("bg-black/50");
-        expect(overlay).toHaveClass("fixed");
-        expect(overlay).toHaveClass("inset-0");
+        const overlay = document.querySelector(
+          '[data-slot="alert-dialog-overlay"]'
+        );
+        expect(overlay?.className).toContain("bg-black/40");
+        expect(overlay?.className).toContain("backdrop-blur-sm");
+        expect(overlay?.className).toContain("fixed");
+        expect(overlay?.className).toContain("inset-0");
       });
     });
   });
@@ -485,7 +500,9 @@ describe("AlertDialog", () => {
       render(
         <AlertDialog defaultOpen>
           <AlertDialogContent>
-            <AlertDialogTitle>{"<script>alert('xss')</script>"}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {"<script>alert('xss')</script>"}
+            </AlertDialogTitle>
           </AlertDialogContent>
         </AlertDialog>
       );
@@ -495,7 +512,9 @@ describe("AlertDialog", () => {
       });
 
       expect(alertSpy).not.toHaveBeenCalled();
-      expect(screen.getByText("<script>alert('xss')</script>")).toBeInTheDocument();
+      expect(
+        screen.getByText("<script>alert('xss')</script>")
+      ).toBeInTheDocument();
       alertSpy.mockRestore();
     });
 
@@ -547,6 +566,7 @@ describe("AlertDialog", () => {
 
       /**
        * Tracks render count for AlertDialog performance testing.
+       *
        * @returns TestAlertDialog component
        */
       function CountingDialog() {
@@ -601,7 +621,11 @@ describe("AlertDialog", () => {
 
       for (let i = 0; i < 5; i++) {
         const { unmount } = render(
-          <TestAlertDialog defaultOpen onAction={onAction} onCancel={onCancel} />
+          <TestAlertDialog
+            defaultOpen
+            onAction={onAction}
+            onCancel={onCancel}
+          />
         );
 
         await waitFor(() => {

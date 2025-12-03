@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for Dialog component system.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Dialog component system. Includes unit, edge
+ *   case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -20,7 +20,10 @@ import {
 } from "./index";
 
 // Verify component types are exported (these components are used via data-slot attributes in tests)
-const _verifyExports: [typeof DialogClose, typeof DialogOverlay] = [DialogClose, DialogOverlay];
+const _verifyExports: [typeof DialogClose, typeof DialogOverlay] = [
+  DialogClose,
+  DialogOverlay,
+];
 void _verifyExports;
 
 // Mock lucide-react icons
@@ -102,7 +105,11 @@ describe("Dialog", () => {
       await waitFor(() => {
         const overlay = document.querySelector('[data-slot="dialog-overlay"]');
         expect(overlay).toBeInTheDocument();
-        expect(overlay).toHaveClass("bg-black/50", "fixed", "inset-0", "z-50");
+        expect(overlay?.className).toContain("bg-black/40");
+        expect(overlay?.className).toContain("backdrop-blur-sm");
+        expect(overlay?.className).toContain("fixed");
+        expect(overlay?.className).toContain("inset-0");
+        expect(overlay?.className).toContain("z-50");
       });
     });
 
@@ -124,7 +131,9 @@ describe("Dialog", () => {
 
       await waitFor(() => {
         expect(screen.getByRole("dialog")).toBeInTheDocument();
-        expect(document.querySelector('[data-slot="dialog-header"]')).toBeInTheDocument();
+        expect(
+          document.querySelector('[data-slot="dialog-header"]')
+        ).toBeInTheDocument();
       });
     });
 
@@ -144,7 +153,9 @@ describe("Dialog", () => {
       await user.click(screen.getByRole("button", { name: "Open" }));
 
       await waitFor(() => {
-        expect(document.querySelector('[data-slot="dialog-footer"]')).toBeInTheDocument();
+        expect(
+          document.querySelector('[data-slot="dialog-footer"]')
+        ).toBeInTheDocument();
       });
     });
 
@@ -225,7 +236,9 @@ describe("Dialog", () => {
       await user.click(screen.getByRole("button", { name: "Open" }));
 
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
+        expect(
+          screen.getByRole("button", { name: "Close" })
+        ).toBeInTheDocument();
       });
 
       await user.click(screen.getByRole("button", { name: "Close" }));
@@ -245,7 +258,9 @@ describe("Dialog", () => {
       await user.click(screen.getByRole("button", { name: "Open" }));
 
       await waitFor(() => {
-        expect(screen.queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("button", { name: "Close" })
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -338,19 +353,25 @@ describe("Dialog", () => {
       // Open first dialog
       await user.click(screen.getByRole("button", { name: "Open 1" }));
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Dialog 1" })).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: "Dialog 1" })
+        ).toBeInTheDocument();
       });
 
       // Close first dialog (modal blocks interaction with second trigger)
       await user.keyboard("{Escape}");
       await waitFor(() => {
-        expect(screen.queryByRole("heading", { name: "Dialog 1" })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("heading", { name: "Dialog 1" })
+        ).not.toBeInTheDocument();
       });
 
       // Open second dialog
       await user.click(screen.getByRole("button", { name: "Open 2" }));
       await waitFor(() => {
-        expect(screen.getByRole("heading", { name: "Dialog 2" })).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: "Dialog 2" })
+        ).toBeInTheDocument();
       });
     });
 
@@ -412,7 +433,9 @@ describe("Dialog", () => {
 
       await waitFor(() => {
         expect(screen.getByRole("dialog")).toBeInTheDocument();
-        expect(screen.queryByRole("button", { name: "Close" })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole("button", { name: "Close" })
+        ).not.toBeInTheDocument();
       });
     });
   });
@@ -436,7 +459,7 @@ describe("Dialog", () => {
       await waitFor(() => {
         const title = screen.getByRole("heading");
         // React escapes HTML in text content, so it will be displayed as text
-        expect(title.textContent).toContain('<script>');
+        expect(title.textContent).toContain("<script>");
         // But script should not execute - no script tags in DOM
         expect(document.querySelector("script")).not.toBeInTheDocument();
       });
@@ -553,7 +576,9 @@ describe("Dialog", () => {
 
       // Portal should be cleaned up
       await waitFor(() => {
-        expect(document.querySelector('[data-slot="dialog-content"]')).not.toBeInTheDocument();
+        expect(
+          document.querySelector('[data-slot="dialog-content"]')
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -576,11 +601,15 @@ describe("Dialog", () => {
       for (let i = 0; i < 10; i++) {
         await user.click(screen.getByRole("button", { name: `Open ${i}` }));
         await waitFor(() => {
-          expect(screen.getByRole("heading", { name: `Dialog ${i}` })).toBeInTheDocument();
+          expect(
+            screen.getByRole("heading", { name: `Dialog ${i}` })
+          ).toBeInTheDocument();
         });
         await user.keyboard("{Escape}");
         await waitFor(() => {
-          expect(screen.queryByRole("heading", { name: `Dialog ${i}` })).not.toBeInTheDocument();
+          expect(
+            screen.queryByRole("heading", { name: `Dialog ${i}` })
+          ).not.toBeInTheDocument();
         });
       }
     });
@@ -681,7 +710,9 @@ describe("Dialog", () => {
 
       // Should not throw errors
       await waitFor(() => {
-        expect(document.querySelector('[data-slot="dialog-content"]')).not.toBeInTheDocument();
+        expect(
+          document.querySelector('[data-slot="dialog-content"]')
+        ).not.toBeInTheDocument();
       });
     });
   });
@@ -709,7 +740,8 @@ describe("Dialog", () => {
 
     it("works with Card content", async () => {
       const user = userEvent.setup();
-      const { Card, CardHeader, CardTitle, CardContent } = await import("./card");
+      const { Card, CardHeader, CardTitle, CardContent } =
+        await import("./card");
 
       render(
         <Dialog>
@@ -828,9 +860,10 @@ describe("Dialog", () => {
         // Check for aria-labelledby and aria-describedby which are always set
         expect(dialog).toHaveAttribute("aria-labelledby");
         expect(dialog).toHaveAttribute("aria-describedby");
-        expect(screen.getByRole("heading", { name: "Accessible Dialog" })).toBeInTheDocument();
+        expect(
+          screen.getByRole("heading", { name: "Accessible Dialog" })
+        ).toBeInTheDocument();
       });
     });
   });
 });
-

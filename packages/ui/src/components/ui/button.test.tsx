@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for Button component.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Button component. Includes unit, edge case,
+ *   security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -24,31 +24,47 @@ describe("Button", () => {
     it("applies default variant classes", () => {
       const { container } = render(<Button>Default</Button>);
       const button = container.querySelector("button");
-      expect(button).toHaveClass("bg-primary", "text-primary-foreground");
+      // Check for gradient background with primary colors (glassmorphism style)
+      expect(button?.className).toContain("from-primary");
+      expect(button?.className).toContain("text-primary-foreground");
     });
 
     it("applies destructive variant classes", () => {
-      const { container } = render(<Button variant="destructive">Delete</Button>);
+      const { container } = render(
+        <Button variant="destructive">Delete</Button>
+      );
       const button = container.querySelector("button");
-      expect(button).toHaveClass("bg-destructive", "text-white");
+      // Check for gradient background with destructive colors
+      expect(button?.className).toContain("from-pink-500");
+      expect(button?.className).toContain("text-white");
     });
 
     it("applies outline variant classes", () => {
       const { container } = render(<Button variant="outline">Outline</Button>);
       const button = container.querySelector("button");
-      expect(button).toHaveClass("border", "bg-background");
+      // Check for glassmorphism outline style
+      expect(button?.className).toContain("border");
+      expect(button?.className).toContain("bg-white/10");
+      expect(button?.className).toContain("backdrop-blur");
     });
 
     it("applies secondary variant classes", () => {
-      const { container } = render(<Button variant="secondary">Secondary</Button>);
+      const { container } = render(
+        <Button variant="secondary">Secondary</Button>
+      );
       const button = container.querySelector("button");
-      expect(button).toHaveClass("bg-secondary", "text-secondary-foreground");
+      // Check for glassmorphism secondary style
+      expect(button?.className).toContain("bg-secondary/40");
+      expect(button?.className).toContain("text-secondary-foreground");
+      expect(button?.className).toContain("backdrop-blur");
     });
 
     it("applies ghost variant classes", () => {
       const { container } = render(<Button variant="ghost">Ghost</Button>);
       const button = container.querySelector("button");
-      expect(button).toHaveClass("hover:bg-accent");
+      // Check for ghost variant hover style
+      expect(button?.className).toContain("hover:bg-accent");
+      expect(button?.className).toContain("text-foreground");
     });
 
     it("applies link variant classes", () => {
@@ -58,7 +74,9 @@ describe("Button", () => {
     });
 
     it("applies default size classes", () => {
-      const { container } = render(<Button size="default">Default Size</Button>);
+      const { container } = render(
+        <Button size="default">Default Size</Button>
+      );
       const button = container.querySelector("button");
       expect(button).toHaveClass("h-9", "px-4", "py-2");
     });
@@ -122,7 +140,10 @@ describe("Button", () => {
       render(<Button disabled>Disabled</Button>);
       const button = screen.getByRole("button");
       expect(button).toBeDisabled();
-      expect(button).toHaveClass("disabled:pointer-events-none", "disabled:opacity-50");
+      expect(button).toHaveClass(
+        "disabled:pointer-events-none",
+        "disabled:opacity-50"
+      );
     });
 
     it("handles onClick events", async () => {
@@ -157,7 +178,9 @@ describe("Button", () => {
     });
 
     it("handles null className", () => {
-      const { container } = render(<Button className={null as unknown as string}>Test</Button>);
+      const { container } = render(
+        <Button className={null as unknown as string}>Test</Button>
+      );
       const button = container.querySelector("button");
       expect(button).toBeInTheDocument();
     });
@@ -197,8 +220,22 @@ describe("Button", () => {
     });
 
     it("handles all variant and size combinations", () => {
-      const variants = ["default", "destructive", "outline", "secondary", "ghost", "link"] as const;
-      const sizes = ["default", "sm", "lg", "icon", "icon-sm", "icon-lg"] as const;
+      const variants = [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+      ] as const;
+      const sizes = [
+        "default",
+        "sm",
+        "lg",
+        "icon",
+        "icon-sm",
+        "icon-lg",
+      ] as const;
 
       variants.forEach((variant) => {
         sizes.forEach((size) => {
@@ -266,7 +303,7 @@ describe("Button", () => {
       const handler = vi.fn();
 
       render(<Button onClick={handler}>Test</Button>);
-      
+
       await user.click(screen.getByRole("button"));
 
       expect(handler).toHaveBeenCalled();
@@ -279,7 +316,11 @@ describe("Button", () => {
   describe("Performance Tests", () => {
     it("does not cause excessive re-renders on prop changes", () => {
       let renderCount = 0;
-      const TestComponent = ({ variant }: { variant: "default" | "destructive" }) => {
+      const TestComponent = ({
+        variant,
+      }: {
+        variant: "default" | "destructive";
+      }) => {
         renderCount++;
         return <Button variant={variant}>Test</Button>;
       };
@@ -292,12 +333,19 @@ describe("Button", () => {
     });
 
     it("batches rapid variant/size changes", async () => {
-      const { rerender } = render(<Button variant="default" size="default">Test</Button>);
+      const { rerender } = render(
+        <Button variant="default" size="default">
+          Test
+        </Button>
+      );
 
       await act(async () => {
         for (let i = 0; i < 10; i++) {
           rerender(
-            <Button variant={i % 2 === 0 ? "default" : "destructive"} size="default">
+            <Button
+              variant={i % 2 === 0 ? "default" : "destructive"}
+              size="default"
+            >
               Test
             </Button>
           );
@@ -310,11 +358,17 @@ describe("Button", () => {
 
     it("memoizes variant classes correctly", () => {
       const { container, rerender } = render(
-        <Button variant="default" size="default">Test</Button>
+        <Button variant="default" size="default">
+          Test
+        </Button>
       );
       const firstRender = container.querySelector("button")?.className;
 
-      rerender(<Button variant="default" size="default">Test</Button>);
+      rerender(
+        <Button variant="default" size="default">
+          Test
+        </Button>
+      );
       const secondRender = container.querySelector("button")?.className;
 
       // Classes should be consistent
@@ -348,7 +402,10 @@ describe("Button", () => {
       await act(async () => {
         for (let i = 0; i < 100; i++) {
           rerender(
-            <Button variant={variants[i % 3]!} size={i % 2 === 0 ? "default" : "sm"}>
+            <Button
+              variant={variants[i % 3]!}
+              size={i % 2 === 0 ? "default" : "sm"}
+            >
               Test
             </Button>
           );
@@ -486,12 +543,20 @@ describe("Button", () => {
 describe("buttonVariants", () => {
   it("generates correct class names for default variant", () => {
     const classes = buttonVariants({ variant: "default", size: "default" });
-    expect(classes).toContain("bg-primary");
+    // Check for gradient background classes (glassmorphism style)
+    expect(classes).toContain("from-primary");
     expect(classes).toContain("text-primary-foreground");
   });
 
   it("generates correct class names for all variants", () => {
-    const variants = ["default", "destructive", "outline", "secondary", "ghost", "link"] as const;
+    const variants = [
+      "default",
+      "destructive",
+      "outline",
+      "secondary",
+      "ghost",
+      "link",
+    ] as const;
     variants.forEach((variant) => {
       const classes = buttonVariants({ variant, size: "default" });
       expect(classes).toBeTruthy();
@@ -500,7 +565,14 @@ describe("buttonVariants", () => {
   });
 
   it("generates correct class names for all sizes", () => {
-    const sizes = ["default", "sm", "lg", "icon", "icon-sm", "icon-lg"] as const;
+    const sizes = [
+      "default",
+      "sm",
+      "lg",
+      "icon",
+      "icon-sm",
+      "icon-lg",
+    ] as const;
     sizes.forEach((size) => {
       const classes = buttonVariants({ variant: "default", size });
       expect(classes).toBeTruthy();
@@ -514,4 +586,3 @@ describe("buttonVariants", () => {
     expect(typeof classes).toBe("string");
   });
 });
-
