@@ -17,6 +17,15 @@ export default tseslint.config(
     },
   },
   {
+    // Disable static-components rule for slot.tsx
+    // The Slot component uses module-level caching for motion components,
+    // which is a deliberate pattern to avoid recreating components during render.
+    files: ["src/components/animate-ui/primitives/animate/slot.tsx"],
+    rules: {
+      "react-hooks/static-components": "off",
+    },
+  },
+  {
     ignores: ["dist/**", "node_modules/**"],
   }
 );

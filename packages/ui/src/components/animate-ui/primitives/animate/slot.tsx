@@ -115,6 +115,29 @@ function mergeProps<T extends HTMLElement>(
 }
 
 /**
+ * Module-level cache for motion components. Created at module initialization,
+ * not during component render.
+ *
+ * @internal
+ */
+const motionCache = new Map<React.ElementType, React.ElementType>();
+
+/**
+ * Helper function to get or create a motion component for a given type. Uses
+ * module-level cache to avoid recreating components.
+ *
+ * @param type - The React element type to create a motion component for
+ * @returns The motion-wrapped component from cache
+ * @internal
+ */
+function getMotionComponent(type: React.ElementType): React.ElementType {
+  if (!motionCache.has(type)) {
+    motionCache.set(type, motion.create(type));
+  }
+  return motionCache.get(type)!;
+}
+
+/**
  * Animated Slot component that wraps child elements with Framer Motion
  * capabilities.
  *
@@ -151,21 +174,17 @@ function Slot<T extends HTMLElement = HTMLElement>({
   ref,
   ...props
 }: SlotProps<T>) {
+  if (!React.isValidElement(children)) return null;
+
   const isAlreadyMotion =
     typeof children.type === "object" &&
     children.type !== null &&
     isMotionComponent(children.type);
 
-   
-  const Base = React.useMemo(
-    () =>
-      isAlreadyMotion
-        ? (children.type as React.ElementType)
-        : motion.create(children.type as React.ElementType),
-    [isAlreadyMotion, children.type]
-  );
-
-  if (!React.isValidElement(children)) return null;
+  // Use child's type directly if already a motion component, otherwise get motion version
+  const Base: React.ElementType = isAlreadyMotion
+    ? (children.type as React.ElementType)
+    : getMotionComponent(children.type as React.ElementType);
 
   const { ref: childRef, ...childProps } = children.props as AnyProps;
 
