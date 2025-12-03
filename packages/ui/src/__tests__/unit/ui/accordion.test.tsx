@@ -1,6 +1,6 @@
 /**
- * @fileoverview Comprehensive tests for Accordion component.
- * Includes unit, accessibility, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Accordion component. Includes unit,
+ *   accessibility, edge case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -11,11 +11,12 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "./accordion";
+} from "@/components/ui/accordion";
 import { raceConditionTester } from "@convergence/test-utils";
 
 /**
  * Test helper component for accordion with configurable type.
+ *
  * @param props - Component props
  * @param props.type - Accordion type (single or multiple)
  * @param props.collapsible - Whether accordion is collapsible
@@ -93,8 +94,12 @@ describe("Accordion", () => {
       render(<TestAccordion />);
 
       // Content should not be visible
-      expect(screen.queryByText("Content for section 1")).not.toBeInTheDocument();
-      expect(screen.queryByText("Content for section 2")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Content for section 1")
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Content for section 2")
+      ).not.toBeInTheDocument();
     });
 
     it("expands on trigger click", async () => {
@@ -119,7 +124,9 @@ describe("Accordion", () => {
 
       await user.click(screen.getByText("Section 1"));
       await waitFor(() => {
-        expect(screen.queryByText("Content for section 1")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Content for section 1")
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -134,7 +141,9 @@ describe("Accordion", () => {
 
       await user.click(screen.getByText("Section 2"));
       await waitFor(() => {
-        expect(screen.queryByText("Content for section 1")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Content for section 1")
+        ).not.toBeInTheDocument();
         expect(screen.getByText("Content for section 2")).toBeInTheDocument();
       });
     });
@@ -165,9 +174,15 @@ describe("Accordion", () => {
     it("has correct data-slot attributes", () => {
       render(<TestAccordion />);
 
-      expect(document.querySelector('[data-slot="accordion"]')).toBeInTheDocument();
-      expect(document.querySelectorAll('[data-slot="accordion-item"]')).toHaveLength(3);
-      expect(document.querySelectorAll('[data-slot="accordion-trigger"]')).toHaveLength(3);
+      expect(
+        document.querySelector('[data-slot="accordion"]')
+      ).toBeInTheDocument();
+      expect(
+        document.querySelectorAll('[data-slot="accordion-item"]')
+      ).toHaveLength(3);
+      expect(
+        document.querySelectorAll('[data-slot="accordion-trigger"]')
+      ).toHaveLength(3);
     });
 
     it("renders with default expanded item", async () => {
@@ -179,12 +194,16 @@ describe("Accordion", () => {
     });
 
     it("renders with multiple default expanded items", async () => {
-      render(<TestAccordion type="multiple" defaultValue={["item-1", "item-3"]} />);
+      render(
+        <TestAccordion type="multiple" defaultValue={["item-1", "item-3"]} />
+      );
 
       await waitFor(() => {
         expect(screen.getByText("Content for section 1")).toBeInTheDocument();
         expect(screen.getByText("Content for section 3")).toBeInTheDocument();
-        expect(screen.queryByText("Content for section 2")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Content for section 2")
+        ).not.toBeInTheDocument();
       });
     });
   });
@@ -318,7 +337,9 @@ describe("Accordion", () => {
       await user.click(trigger!);
 
       await waitFor(() => {
-        expect(screen.queryByText("This should not appear")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("This should not appear")
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -355,7 +376,9 @@ describe("Accordion", () => {
       render(
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
-            <AccordionTrigger className="custom-trigger">Section</AccordionTrigger>
+            <AccordionTrigger className="custom-trigger">
+              Section
+            </AccordionTrigger>
             <AccordionContent>Content</AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -370,7 +393,9 @@ describe("Accordion", () => {
         <Accordion type="single" collapsible defaultValue="item-1">
           <AccordionItem value="item-1">
             <AccordionTrigger>Section</AccordionTrigger>
-            <AccordionContent className="custom-content">Content</AccordionContent>
+            <AccordionContent className="custom-content">
+              Content
+            </AccordionContent>
           </AccordionItem>
         </Accordion>
       );
@@ -379,7 +404,9 @@ describe("Accordion", () => {
         expect(screen.getByText("Content")).toBeInTheDocument();
       });
 
-      expect(screen.getByText("Content").closest("div")).toHaveClass("custom-content");
+      expect(screen.getByText("Content").closest("div")).toHaveClass(
+        "custom-content"
+      );
     });
   });
 
@@ -398,7 +425,9 @@ describe("Accordion", () => {
       await user.click(screen.getByText("Empty Section"));
 
       // Should not crash
-      expect(document.querySelector('[data-slot="accordion-content"]')).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="accordion-content"]')
+      ).toBeInTheDocument();
     });
 
     it("handles very long trigger text", () => {
@@ -469,7 +498,9 @@ describe("Accordion", () => {
       render(
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
-            <AccordionTrigger>{"<script>alert('xss')</script>"}</AccordionTrigger>
+            <AccordionTrigger>
+              {"<script>alert('xss')</script>"}
+            </AccordionTrigger>
             <AccordionContent>&amp; &lt; &gt; &quot;</AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -477,7 +508,7 @@ describe("Accordion", () => {
 
       await user.click(screen.getByText("<script>alert('xss')</script>"));
 
-      expect(screen.getByText("& < > \"")).toBeInTheDocument();
+      expect(screen.getByText('& < > "')).toBeInTheDocument();
     });
   });
 
@@ -488,14 +519,18 @@ describe("Accordion", () => {
       render(
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
-            <AccordionTrigger>{"<img src=x onerror=alert('xss')>"}</AccordionTrigger>
+            <AccordionTrigger>
+              {"<img src=x onerror=alert('xss')>"}
+            </AccordionTrigger>
             <AccordionContent>Content</AccordionContent>
           </AccordionItem>
         </Accordion>
       );
 
       expect(alertSpy).not.toHaveBeenCalled();
-      expect(screen.getByText("<img src=x onerror=alert('xss')>")).toBeInTheDocument();
+      expect(
+        screen.getByText("<img src=x onerror=alert('xss')>")
+      ).toBeInTheDocument();
       alertSpy.mockRestore();
     });
 
@@ -507,7 +542,9 @@ describe("Accordion", () => {
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger>Section</AccordionTrigger>
-            <AccordionContent>{"<script>alert('xss')</script>"}</AccordionContent>
+            <AccordionContent>
+              {"<script>alert('xss')</script>"}
+            </AccordionContent>
           </AccordionItem>
         </Accordion>
       );
@@ -515,7 +552,9 @@ describe("Accordion", () => {
       await user.click(screen.getByText("Section"));
 
       await waitFor(() => {
-        expect(screen.getByText("<script>alert('xss')</script>")).toBeInTheDocument();
+        expect(
+          screen.getByText("<script>alert('xss')</script>")
+        ).toBeInTheDocument();
       });
 
       expect(alertSpy).not.toHaveBeenCalled();
@@ -546,6 +585,7 @@ describe("Accordion", () => {
 
       /**
        * Tracks render count for accordion performance testing.
+       *
        * @returns TestAccordion component
        */
       function CountingAccordion() {
@@ -564,7 +604,9 @@ describe("Accordion", () => {
 
       await user.click(screen.getByText("Section 1"));
       await waitFor(() => {
-        expect(screen.queryByText("Content for section 1")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Content for section 1")
+        ).not.toBeInTheDocument();
       });
 
       expect(renderCount).toBeLessThan(initialCount + 10);
@@ -602,7 +644,9 @@ describe("Accordion", () => {
 
       // Should end in a valid state
       const triggerButton = trigger.closest("button");
-      expect(triggerButton?.getAttribute("data-state")).toMatch(/^(open|closed)$/);
+      expect(triggerButton?.getAttribute("data-state")).toMatch(
+        /^(open|closed)$/
+      );
     });
 
     it("handles rapid tab switching", async () => {
@@ -616,7 +660,9 @@ describe("Accordion", () => {
       }
 
       // Should be in valid state
-      expect(document.querySelector('[data-slot="accordion"]')).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="accordion"]')
+      ).toBeInTheDocument();
     });
 
     it("handles mount/unmount cycles", async () => {
@@ -654,7 +700,9 @@ describe("Accordion", () => {
         rerender(<TestAccordion type={i % 2 === 0 ? "multiple" : "single"} />);
       }
 
-      expect(document.querySelector('[data-slot="accordion"]')).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="accordion"]')
+      ).toBeInTheDocument();
     });
 
     it("handles rapid keyboard navigation", async () => {
@@ -667,12 +715,15 @@ describe("Accordion", () => {
         await user.keyboard("{Enter}");
       }
 
-      expect(document.querySelector('[data-slot="accordion"]')).toBeInTheDocument();
+      expect(
+        document.querySelector('[data-slot="accordion"]')
+      ).toBeInTheDocument();
     });
 
     it("handles controlled value changes", async () => {
       /**
        * Controlled accordion for testing external state management.
+       *
        * @returns Accordion with external value controls
        */
       function ControlledAccordion() {
@@ -683,7 +734,12 @@ describe("Accordion", () => {
             <button onClick={() => setValue("item-1")}>Open 1</button>
             <button onClick={() => setValue("item-2")}>Open 2</button>
             <button onClick={() => setValue("")}>Close all</button>
-            <Accordion type="single" collapsible value={value} onValueChange={setValue}>
+            <Accordion
+              type="single"
+              collapsible
+              value={value}
+              onValueChange={setValue}
+            >
               <AccordionItem value="item-1">
                 <AccordionTrigger>Section 1</AccordionTrigger>
                 <AccordionContent>Content 1</AccordionContent>

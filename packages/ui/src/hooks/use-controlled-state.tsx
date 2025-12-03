@@ -48,7 +48,7 @@ export function useControlledState<T, Rest extends any[] = []>(
   const { value, defaultValue, onChange } = props;
 
   const [state, setInternalState] = React.useState<T>(
-    value !== undefined ? value : (defaultValue as T)
+    value ?? (defaultValue as T)
   );
 
   React.useEffect(() => {

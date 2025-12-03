@@ -14,7 +14,7 @@ import {
   TableRow,
   TableCell,
   TableCaption,
-} from "./table";
+} from "@/components/ui/table";
 
 describe("Table", () => {
   beforeEach(() => {
@@ -689,7 +689,7 @@ describe("Table", () => {
     });
 
     it("composes correctly with Badge component", async () => {
-      const { Badge } = await import("./badge");
+      const { Badge } = await import("@/components/ui/badge");
       render(
         <Table>
           <TableBody>

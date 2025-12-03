@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import * as React from "react";
-import { CodeBlock } from "./code-block";
+import { CodeBlock } from "@/components/animate-ui/primitives/animate/code-block";
 
 // Mock shiki - escape HTML to simulate real shiki behavior
 const escapeHtml = (str: string) =>

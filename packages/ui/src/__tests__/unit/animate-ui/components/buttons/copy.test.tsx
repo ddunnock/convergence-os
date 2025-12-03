@@ -16,7 +16,7 @@ import {
 import { render, screen, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { CopyButton } from "./copy";
+import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 
 // Mock lucide-react icons - inline to avoid hoisting issues
 vi.mock("lucide-react", () => {

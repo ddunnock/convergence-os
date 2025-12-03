@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogDescription,
   Button,
-} from "./index";
+} from "@/components/ui/index";
 
 // Verify component types are exported (these components are used via data-slot attributes in tests)
 const _verifyExports: [typeof DialogClose, typeof DialogOverlay] = [
@@ -741,7 +741,7 @@ describe("Dialog", () => {
     it("works with Card content", async () => {
       const user = userEvent.setup();
       const { Card, CardHeader, CardTitle, CardContent } =
-        await import("./card");
+        await import("@/components/ui/card");
 
       render(
         <Dialog>

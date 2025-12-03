@@ -3,6 +3,3 @@
 
 /* Import theme CSS custom properties */
 @import "./themes.css";
-
-/* Tell Tailwind to scan @convergence/ui package source files for class usage */
-@source "../../../../packages/ui/src/**/*.{ts,tsx}";

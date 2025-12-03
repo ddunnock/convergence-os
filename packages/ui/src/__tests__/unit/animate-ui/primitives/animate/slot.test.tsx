@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { Slot } from "./slot";
+import { Slot } from "@/components/animate-ui/primitives/animate/slot";
 
 // Mock motion/react - inline components in factory to avoid hoisting issues
 vi.mock("motion/react", () => {

@@ -1,16 +1,17 @@
 /**
- * @fileoverview Comprehensive tests for ThemeSwitcher component.
- * Includes unit, accessibility, edge case, and chaos tests.
+ * @file Comprehensive tests for ThemeSwitcher component. Includes unit,
+ *   accessibility, edge case, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ThemeSwitcher } from "./theme-switcher";
-import { ThemeProvider, resetThemeState } from "../providers/theme-provider";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ThemeProvider, resetThemeState } from "@/providers/theme-provider";
 
 /**
  * Test wrapper providing ThemeProvider context.
+ *
  * @param props - Component props
  * @param props.children - Child components to wrap
  * @returns ThemeProvider with children
@@ -404,7 +405,7 @@ describe("ThemeSwitcher", () => {
 
       // The className should be escaped and not execute
       const container = screen.getByLabelText("Theme variant").closest("div");
-      expect(container).toHaveClass("<script>alert(\"xss\")</script>");
+      expect(container).toHaveClass('<script>alert("xss")</script>');
 
       // alert should not have been called (XSS prevented)
       expect(alertSpy).not.toHaveBeenCalled();
@@ -414,7 +415,7 @@ describe("ThemeSwitcher", () => {
     it("handles className with HTML entities safely", async () => {
       render(
         <TestWrapper>
-          <ThemeSwitcher className="class&quot;name" />
+          <ThemeSwitcher className='class"name' />
         </TestWrapper>
       );
 
@@ -434,6 +435,7 @@ describe("ThemeSwitcher", () => {
 
       /**
        * Tracks render count for ThemeSwitcher performance testing.
+       *
        * @returns ThemeSwitcher component
        */
       function CountingThemeSwitcher() {
@@ -501,7 +503,9 @@ describe("ThemeSwitcher", () => {
         // Last render has colorModeOnly={false}, so both should be visible
         const variantSelect = screen.queryByLabelText("Theme variant");
         // Will be either present or not based on final state
-        expect(variantSelect !== null || screen.queryByLabelText("Color mode")).toBeTruthy();
+        expect(
+          variantSelect !== null || screen.queryByLabelText("Color mode")
+        ).toBeTruthy();
       });
     });
 

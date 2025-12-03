@@ -45,7 +45,7 @@ type DOMMotionProps<T extends HTMLElement = HTMLElement> = Omit<
  */
 type WithAsChild<Base extends object> =
   | (Base & { asChild: true; children: React.ReactElement })
-  | (Base & { asChild?: false | undefined });
+  | (Base & { asChild?: false });
 
 /**
  * Props for the Slot component.
@@ -75,7 +75,7 @@ function mergeRefs<T>(
       if (typeof ref === "function") {
         ref(node);
       } else {
-        (ref as React.RefObject<T | null>).current = node;
+        ref.current = node;
       }
     });
   };

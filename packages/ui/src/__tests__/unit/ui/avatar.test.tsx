@@ -1,13 +1,13 @@
 /**
- * @fileoverview Comprehensive tests for Avatar component system.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Avatar component system. Includes unit, edge
+ *   case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
-import { Card, CardHeader, CardTitle } from "./card";
-import { Button } from "./button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 describe("Avatar", () => {
   beforeEach(() => {
@@ -34,9 +34,13 @@ describe("Avatar", () => {
         </Avatar>
       );
       // Radix UI AvatarImage may conditionally render, so check for img or the data-slot
-      const image = container.querySelector('[data-slot="avatar-image"]') || container.querySelector('img');
+      const image =
+        container.querySelector('[data-slot="avatar-image"]') ||
+        container.querySelector("img");
       // Avatar component should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // If image exists, verify attributes
       if (image) {
         expect(image).toHaveAttribute("src", "/avatar.jpg");
@@ -68,18 +72,18 @@ describe("Avatar", () => {
     it("applies custom className to AvatarImage", () => {
       const { container } = render(
         <Avatar>
-          <AvatarImage
-            src="/avatar.jpg"
-            alt="User"
-            className="custom-image"
-          />
+          <AvatarImage src="/avatar.jpg" alt="User" className="custom-image" />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
       );
       // Radix UI AvatarImage may conditionally render
-      const image = container.querySelector('[data-slot="avatar-image"]') || container.querySelector('img');
+      const image =
+        container.querySelector('[data-slot="avatar-image"]') ||
+        container.querySelector("img");
       // Avatar component should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // If image exists, verify className
       if (image) {
         expect(image).toHaveClass("custom-image");
@@ -105,16 +109,19 @@ describe("Avatar", () => {
       );
 
       // Simulate image error - Radix UI will handle this automatically
-      const image = container.querySelector('img');
+      const image = container.querySelector("img");
       if (image && image.onerror) {
-        const errorEvent = new Event('error');
+        const errorEvent = new Event("error");
         image.onerror(errorEvent as unknown as Event);
       }
 
-      await waitFor(() => {
-        const fallback = screen.getByText("JD");
-        expect(fallback).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        () => {
+          const fallback = screen.getByText("JD");
+          expect(fallback).toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it("hides fallback when image loads successfully", async () => {
@@ -150,10 +157,14 @@ describe("Avatar", () => {
         </Avatar>
       );
       // Avatar container should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // AvatarImage component is rendered (may conditionally show img)
       // No fallback should be present
-      expect(container.querySelector('[data-slot="avatar-fallback"]')).not.toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar-fallback"]')
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -199,9 +210,13 @@ describe("Avatar", () => {
         </Avatar>
       );
       // Avatar container should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // Check if image exists and has alt attribute
-      const image = container.querySelector('[data-slot="avatar-image"]') || container.querySelector('img');
+      const image =
+        container.querySelector('[data-slot="avatar-image"]') ||
+        container.querySelector("img");
       if (image) {
         expect(image).toHaveAttribute("alt", longAlt);
       }
@@ -263,7 +278,9 @@ describe("Avatar", () => {
         </Avatar>
       );
       // Avatar container should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // React should handle malicious src safely - component should render without crashing
       expect(container).toBeInTheDocument();
     });
@@ -333,16 +350,18 @@ describe("Avatar", () => {
       );
 
       // Simulate some images failing
-      const images = container.querySelectorAll('img');
+      const images = container.querySelectorAll("img");
       images.forEach((img, i) => {
         if (i % 2 === 0) {
-          img.dispatchEvent(new Event('error'));
+          img.dispatchEvent(new Event("error"));
         }
       });
 
       await waitFor(() => {
         // Some should show fallbacks, some should show images
-        expect(container.querySelectorAll('[data-slot="avatar"]')).toHaveLength(10);
+        expect(container.querySelectorAll('[data-slot="avatar"]')).toHaveLength(
+          10
+        );
       });
     });
   });
@@ -363,7 +382,9 @@ describe("Avatar", () => {
         </Card>
       );
       // Avatar should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       expect(screen.getByText("User Profile")).toBeInTheDocument();
     });
 
@@ -377,7 +398,9 @@ describe("Avatar", () => {
         </div>
       );
       expect(screen.getByText("JD")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Follow" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Follow" })
+      ).toBeInTheDocument();
     });
 
     it("composes correctly with multiple avatars", () => {
@@ -407,13 +430,16 @@ describe("Avatar", () => {
         </Avatar>
       );
       // Avatar container should be present
-      expect(container.querySelector('[data-slot="avatar"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[data-slot="avatar"]')
+      ).toBeInTheDocument();
       // Check if image exists and has alt attribute
-      const image = container.querySelector('[data-slot="avatar-image"]') || container.querySelector('img[alt="John Doe\'s profile picture"]');
+      const image =
+        container.querySelector('[data-slot="avatar-image"]') ||
+        container.querySelector('img[alt="John Doe\'s profile picture"]');
       if (image) {
         expect(image).toHaveAttribute("alt", "John Doe's profile picture");
       }
     });
   });
 });
-

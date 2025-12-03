@@ -1,11 +1,11 @@
 /**
- * @fileoverview Comprehensive tests for Badge component.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Badge component. Includes unit, edge case,
+ *   security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Badge, badgeVariants } from "./badge";
+import { Badge, badgeVariants } from "@/components/ui/badge";
 
 describe("Badge", () => {
   beforeEach(() => {
@@ -27,15 +27,15 @@ describe("Badge", () => {
     });
 
     it("applies secondary variant classes", () => {
-      const { container } = render(<Badge variant="secondary">Secondary</Badge>);
+      const { container } = render(
+        <Badge variant="secondary">Secondary</Badge>
+      );
       const badge = container.querySelector('[data-slot="badge"]');
       expect(badge).toHaveClass("bg-secondary", "text-secondary-foreground");
     });
 
     it("applies destructive variant classes", () => {
-      const { container } = render(
-        <Badge variant="destructive">Error</Badge>
-      );
+      const { container } = render(<Badge variant="destructive">Error</Badge>);
       const badge = container.querySelector('[data-slot="badge"]');
       expect(badge).toHaveClass("bg-destructive", "text-white");
     });
@@ -197,7 +197,12 @@ describe("Badge", () => {
     });
 
     it("maintains performance with many variants (simulated)", () => {
-      const variants = ["default", "secondary", "destructive", "outline"] as const;
+      const variants = [
+        "default",
+        "secondary",
+        "destructive",
+        "outline",
+      ] as const;
       const renderManyBadges = () => {
         return (
           <div>
@@ -219,11 +224,16 @@ describe("Badge", () => {
 
   describe("Chaos Tests", () => {
     it("handles rapid prop changes without crashing", () => {
-      const { rerender } = render(<Badge className="class-a">Chaos Badge</Badge>);
+      const { rerender } = render(
+        <Badge className="class-a">Chaos Badge</Badge>
+      );
       expect(() => {
         for (let i = 0; i < 100; i++) {
           rerender(
-            <Badge className={`class-${i % 2}`} variant={i % 2 === 0 ? "default" : "secondary"}>
+            <Badge
+              className={`class-${i % 2}`}
+              variant={i % 2 === 0 ? "default" : "secondary"}
+            >
               Chaos Badge
             </Badge>
           );
@@ -242,9 +252,7 @@ describe("Badge", () => {
     });
 
     it("handles asChild prop changes", () => {
-      const { rerender } = render(
-        <Badge asChild={false}>Not Child</Badge>
-      );
+      const { rerender } = render(<Badge asChild={false}>Not Child</Badge>);
       expect(screen.getByText("Not Child").tagName).toBe("SPAN");
 
       rerender(
@@ -252,13 +260,16 @@ describe("Badge", () => {
           <a href="/test">As Child</a>
         </Badge>
       );
-      expect(screen.getByRole("link", { name: "As Child" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "As Child" })
+      ).toBeInTheDocument();
     });
   });
 
   describe("Integration Tests", () => {
     it("works correctly within Card component", async () => {
-      const { Card, CardHeader, CardTitle } = await import("./card");
+      const { Card, CardHeader, CardTitle } =
+        await import("@/components/ui/card");
       render(
         <Card>
           <CardHeader>
@@ -274,7 +285,7 @@ describe("Badge", () => {
     });
 
     it("works correctly with Button component", async () => {
-      const { Button } = await import("./button");
+      const { Button } = await import("@/components/ui/button");
       render(
         <div className="flex items-center gap-2">
           <Badge>New</Badge>
@@ -282,7 +293,9 @@ describe("Badge", () => {
         </div>
       );
       expect(screen.getByText("New")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Action" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Action" })
+      ).toBeInTheDocument();
     });
 
     it("works correctly as a link with asChild", () => {
@@ -329,4 +342,3 @@ describe("Badge", () => {
     });
   });
 });
-

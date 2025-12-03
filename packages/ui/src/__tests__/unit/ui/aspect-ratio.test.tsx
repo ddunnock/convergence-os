@@ -1,11 +1,11 @@
 /**
- * @fileoverview Comprehensive tests for AspectRatio component.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for AspectRatio component. Includes unit, edge
+ *   case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { AspectRatio } from "./aspect-ratio";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 describe("AspectRatio", () => {
   beforeEach(() => {
@@ -248,7 +248,7 @@ describe("AspectRatio", () => {
 
   describe("Integration Tests", () => {
     it("works correctly with Card component", async () => {
-      const cardModule = await import("./card");
+      const cardModule = await import("@/components/ui/card");
       const { Card, CardContent } = cardModule;
       render(
         <Card>
@@ -296,4 +296,3 @@ describe("AspectRatio", () => {
     });
   });
 });
-

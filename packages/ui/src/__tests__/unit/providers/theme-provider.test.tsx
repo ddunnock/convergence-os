@@ -1,10 +1,16 @@
 /**
- * @fileoverview Comprehensive tests for ThemeProvider and useTheme hook.
- * Includes unit, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for ThemeProvider and useTheme hook. Includes unit,
+ *   edge case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, act, waitFor, renderHook } from "@testing-library/react";
+import {
+  render,
+  screen,
+  act,
+  waitFor,
+  renderHook,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
   ThemeProvider,
@@ -13,13 +19,14 @@ import {
   resetThemeState,
   THEME_VARIANT_KEY,
   type ThemeVariant,
-} from "./theme-provider";
+} from "@/providers/theme-provider";
 
 // Default theme variant for tests - used for type checking and test assertions
 const defaultTestVariant: ThemeVariant = "convergence";
 
 /**
  * Helper component for testing useTheme hook behavior.
+ *
  * @returns React element displaying theme state
  */
 function ThemeConsumer() {
@@ -42,10 +49,7 @@ function ThemeConsumer() {
       >
         Set Convergence
       </button>
-      <button
-        data-testid="set-dark"
-        onClick={() => theme.setColorMode("dark")}
-      >
+      <button data-testid="set-dark" onClick={() => theme.setColorMode("dark")}>
         Set Dark
       </button>
       <button
@@ -65,7 +69,9 @@ describe("ThemeProvider", () => {
     vi.clearAllMocks();
     localStorage.clear();
     // Remove any theme CSS links
-    document.querySelectorAll("#theme-variant-css").forEach((el) => el.remove());
+    document
+      .querySelectorAll("#theme-variant-css")
+      .forEach((el) => el.remove());
     document.documentElement.removeAttribute("data-theme");
   });
 
@@ -93,7 +99,9 @@ describe("ThemeProvider", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "convergence"
+        );
       });
     });
 
@@ -121,7 +129,9 @@ describe("ThemeProvider", () => {
 
       // Should show synthwave
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("synthwave");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "synthwave"
+        );
       });
     });
 
@@ -149,7 +159,9 @@ describe("ThemeProvider", () => {
       await user.click(screen.getByTestId("set-synthwave"));
 
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("synthwave");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "synthwave"
+        );
       });
     });
 
@@ -193,7 +205,9 @@ describe("ThemeProvider", () => {
       await user.click(screen.getByTestId("set-synthwave"));
 
       await waitFor(() => {
-        expect(document.documentElement.getAttribute("data-theme")).toBe("synthwave");
+        expect(document.documentElement.getAttribute("data-theme")).toBe(
+          "synthwave"
+        );
       });
     });
 
@@ -222,7 +236,9 @@ describe("ThemeProvider", () => {
   describe("Edge Cases", () => {
     it("throws error when useTheme is used outside ThemeProvider", () => {
       // Suppress console.error for this test
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      const consoleSpy = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       expect(() => {
         render(<ThemeConsumer />);
@@ -242,7 +258,9 @@ describe("ThemeProvider", () => {
 
       // Should fall back to default
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "convergence"
+        );
       });
     });
 
@@ -260,7 +278,9 @@ describe("ThemeProvider", () => {
 
       // Should not throw and use default
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "convergence"
+        );
       });
 
       localStorage.getItem = originalGetItem;
@@ -283,7 +303,9 @@ describe("ThemeProvider", () => {
       await user.click(screen.getByTestId("set-synthwave"));
 
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("synthwave");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "synthwave"
+        );
       });
 
       localStorage.setItem = originalSetItem;
@@ -335,12 +357,17 @@ describe("ThemeProvider", () => {
 
       // Should ignore XSS attempt and use default
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "convergence"
+        );
       });
     });
 
     it("prevents prototype pollution via theme variant", async () => {
-      localStorage.setItem(THEME_VARIANT_KEY, '{"__proto__":{"polluted":true}}');
+      localStorage.setItem(
+        THEME_VARIANT_KEY,
+        '{"__proto__":{"polluted":true}}'
+      );
 
       render(
         <ThemeProvider>
@@ -350,7 +377,9 @@ describe("ThemeProvider", () => {
 
       // Should ignore invalid value
       await waitFor(() => {
-        expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+        expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+          "convergence"
+        );
       });
 
       // Verify no prototype pollution
@@ -389,6 +418,7 @@ describe("ThemeProvider", () => {
 
       /**
        * Tracks render count for performance testing.
+       *
        * @returns React element with theme variant
        */
       function RenderCounter() {
@@ -419,6 +449,7 @@ describe("ThemeProvider", () => {
 
       /**
        * Tracks render count for batching test.
+       *
        * @returns React element with clickable theme toggle
        */
       function RenderCounter() {
@@ -473,7 +504,9 @@ describe("ThemeProvider", () => {
       // Rapid fire theme changes
       await act(async () => {
         for (let i = 0; i < 100; i++) {
-          const button = screen.getByTestId(i % 2 === 0 ? "set-synthwave" : "set-convergence");
+          const button = screen.getByTestId(
+            i % 2 === 0 ? "set-synthwave" : "set-convergence"
+          );
           await user.click(button);
         }
       });
@@ -509,7 +542,9 @@ describe("ThemeProvider", () => {
 
         // Should not crash and fall back to default
         await waitFor(() => {
-          expect(screen.getByTestId("theme-variant")).toHaveTextContent("convergence");
+          expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+            "convergence"
+          );
         });
 
         // Clean up before next iteration
@@ -583,7 +618,9 @@ describe("ThemeProvider", () => {
       });
 
       // Should not crash
-      expect(screen.getByTestId("theme-variant")).toHaveTextContent("synthwave");
+      expect(screen.getByTestId("theme-variant")).toHaveTextContent(
+        "synthwave"
+      );
     });
   });
 });

@@ -16,7 +16,7 @@ import {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-} from "./alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { raceConditionTester } from "@convergence/test-utils";
 
 /**

@@ -23,3 +23,41 @@ export { AspectRatio } from "./ui/aspect-ratio";
 export { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 export { Badge, badgeVariants } from "./ui/badge";
 export { Button, buttonVariants } from "./ui/button";
+
+// Glass UI components (glassmorphism variants)
+export {
+  // Accordion
+  GlassAccordion,
+  GlassAccordionItem,
+  GlassAccordionContent,
+  GlassAccordionTrigger,
+  type GlassAccordionTriggerProps,
+  // Alert
+  GlassAlert,
+  GlassAlertTitle,
+  GlassAlertDescription,
+  type GlassAlertProps,
+  // Alert Dialog
+  GlassAlertDialog,
+  GlassAlertDialogTrigger,
+  GlassAlertDialogContent,
+  GlassAlertDialogHeader,
+  GlassAlertDialogFooter,
+  GlassAlertDialogTitle,
+  GlassAlertDialogDescription,
+  GlassAlertDialogAction,
+  GlassAlertDialogCancel,
+  type GlassAlertDialogContentProps,
+  // Button
+  GlassButton,
+  type GlassButtonProps,
+  // Dialog
+  GlassDialog,
+  GlassDialogTrigger,
+  GlassDialogContent,
+  GlassDialogHeader,
+  GlassDialogFooter,
+  GlassDialogTitle,
+  GlassDialogDescription,
+  type GlassDialogContentProps,
+} from "./ui/glass";

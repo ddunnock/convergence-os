@@ -14,8 +14,8 @@ import {
   CardAction,
   CardContent,
   CardFooter,
-} from "./card";
-import { Button } from "./button";
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 describe("Card", () => {
   beforeEach(() => {

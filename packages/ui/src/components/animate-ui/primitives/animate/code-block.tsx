@@ -165,32 +165,39 @@ function CodeBlock({
     const interval = totalDuration / characters.length;
     let intervalId: NodeJS.Timeout;
 
+    // Extract animation step logic to reduce nesting
+    const animateNextCharacter = () => {
+      const nextChar = characters.slice(0, index + 1).join("");
+      setVisibleCode(nextChar);
+      onWrite?.({
+        index: index + 1,
+        length: characters.length,
+        done: false,
+      });
+      index += 1;
+      localRef.current?.scrollTo({
+        top: localRef.current?.scrollHeight,
+        behavior: "smooth",
+      });
+    };
+
+    const completeAnimation = () => {
+      clearInterval(intervalId);
+      setIsDone(true);
+      onDone?.();
+      onWrite?.({
+        index: characters.length,
+        length: characters.length,
+        done: true,
+      });
+    };
+
     const timeout = setTimeout(() => {
       intervalId = setInterval(() => {
         if (index < characters.length) {
-          setVisibleCode(() => {
-            const nextChar = characters.slice(0, index + 1).join("");
-            onWrite?.({
-              index: index + 1,
-              length: characters.length,
-              done: false,
-            });
-            index += 1;
-            return nextChar;
-          });
-          localRef.current?.scrollTo({
-            top: localRef.current?.scrollHeight,
-            behavior: "smooth",
-          });
+          animateNextCharacter();
         } else {
-          clearInterval(intervalId);
-          setIsDone(true);
-          onDone?.();
-          onWrite?.({
-            index: characters.length,
-            length: characters.length,
-            done: true,
-          });
+          completeAnimation();
         }
       }, interval);
     }, delay);

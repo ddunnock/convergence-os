@@ -16,7 +16,12 @@ import {
 import { render, screen, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
-import { Code, CodeHeader, CodeBlock, useCode } from "./code";
+import {
+  Code,
+  CodeHeader,
+  CodeBlock,
+  useCode,
+} from "@/components/animate-ui/components/animate/code";
 
 // Mock next-themes
 vi.mock("next-themes", () => ({

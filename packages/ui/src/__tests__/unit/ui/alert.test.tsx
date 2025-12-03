@@ -1,11 +1,11 @@
 /**
- * @fileoverview Comprehensive tests for Alert component.
- * Includes unit, accessibility, edge case, security, performance, and chaos tests.
+ * @file Comprehensive tests for Alert component. Includes unit, accessibility,
+ *   edge case, security, performance, and chaos tests.
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Alert, AlertTitle, AlertDescription } from "./alert";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { rapidFire, raceConditionTester } from "@convergence/test-utils";
 
 describe("Alert", () => {
@@ -63,7 +63,11 @@ describe("Alert", () => {
     });
 
     it("spreads additional props", () => {
-      render(<Alert data-testid="custom-alert" id="my-alert">Test</Alert>);
+      render(
+        <Alert data-testid="custom-alert" id="my-alert">
+          Test
+        </Alert>
+      );
 
       const alert = screen.getByTestId("custom-alert");
       expect(alert).toHaveAttribute("id", "my-alert");
@@ -95,7 +99,9 @@ describe("Alert", () => {
     it("applies custom className", () => {
       render(
         <Alert>
-          <AlertTitle className="custom-title" data-testid="title">Title</AlertTitle>
+          <AlertTitle className="custom-title" data-testid="title">
+            Title
+          </AlertTitle>
         </Alert>
       );
 
@@ -278,7 +284,9 @@ describe("Alert", () => {
         </Alert>
       );
 
-      expect(screen.getByText("<script>alert('xss')</script>")).toBeInTheDocument();
+      expect(
+        screen.getByText("<script>alert('xss')</script>")
+      ).toBeInTheDocument();
     });
 
     it("handles multiple icons", () => {
@@ -339,12 +347,14 @@ describe("Alert", () => {
 
       expect(alertSpy).not.toHaveBeenCalled();
       // Text should be escaped
-      expect(screen.getByText("<img src=x onerror=alert('xss')>")).toBeInTheDocument();
+      expect(
+        screen.getByText("<img src=x onerror=alert('xss')>")
+      ).toBeInTheDocument();
       alertSpy.mockRestore();
     });
 
     it("handles className with HTML entities safely", () => {
-      render(<Alert className="class&quot;name">Test</Alert>);
+      render(<Alert className='class"name'>Test</Alert>);
 
       const alert = screen.getByRole("alert");
       expect(alert).toBeInTheDocument();
@@ -365,6 +375,7 @@ describe("Alert", () => {
 
       /**
        * Tracks render count for Alert performance testing.
+       *
        * @returns Alert component
        */
       function CountingAlert() {
@@ -385,11 +396,16 @@ describe("Alert", () => {
 
       /**
        * Tracks render count for variant change testing.
+       *
        * @param props - Component props
        * @param props.variant - Alert variant
        * @returns Alert component with specified variant
        */
-      function CountingAlert({ variant }: { variant?: "default" | "destructive" }) {
+      function CountingAlert({
+        variant,
+      }: {
+        variant?: "default" | "destructive";
+      }) {
         renderCount++;
         return <Alert variant={variant}>Test</Alert>;
       }
@@ -406,16 +422,23 @@ describe("Alert", () => {
 
   describe("Chaos Tests", () => {
     it("handles rapid variant switching", async () => {
-      const variants: Array<"default" | "destructive"> = ["default", "destructive"];
+      const variants: Array<"default" | "destructive"> = [
+        "default",
+        "destructive",
+      ];
       let currentVariant: "default" | "destructive" = "default";
 
       const { rerender } = render(<Alert variant={currentVariant}>Test</Alert>);
 
-      await rapidFire(() => {
-        const randomIndex = Math.floor(Math.random() * variants.length);
-        currentVariant = variants[randomIndex] ?? "default";
-        rerender(<Alert variant={currentVariant}>Test</Alert>);
-      }, 100, 0);
+      await rapidFire(
+        () => {
+          const randomIndex = Math.floor(Math.random() * variants.length);
+          currentVariant = variants[randomIndex] ?? "default";
+          rerender(<Alert variant={currentVariant}>Test</Alert>);
+        },
+        100,
+        0
+      );
 
       const alert = screen.getByRole("alert");
       expect(alert).toBeInTheDocument();
@@ -442,7 +465,13 @@ describe("Alert", () => {
     });
 
     it("handles rapid content changes", async () => {
-      const contents = ["Content 1", "Content 2", "Content 3", "Content 4", "Content 5"];
+      const contents = [
+        "Content 1",
+        "Content 2",
+        "Content 3",
+        "Content 4",
+        "Content 5",
+      ];
       let currentContent = contents[0];
 
       const { rerender } = render(
@@ -451,14 +480,19 @@ describe("Alert", () => {
         </Alert>
       );
 
-      await rapidFire(() => {
-        currentContent = contents[Math.floor(Math.random() * contents.length)];
-        rerender(
-          <Alert>
-            <AlertTitle>{currentContent}</AlertTitle>
-          </Alert>
-        );
-      }, 100, 0);
+      await rapidFire(
+        () => {
+          currentContent =
+            contents[Math.floor(Math.random() * contents.length)];
+          rerender(
+            <Alert>
+              <AlertTitle>{currentContent}</AlertTitle>
+            </Alert>
+          );
+        },
+        100,
+        0
+      );
 
       const alert = screen.getByRole("alert");
       expect(alert).toBeInTheDocument();
