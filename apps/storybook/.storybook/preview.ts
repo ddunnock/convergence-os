@@ -7,10 +7,10 @@ import "../src/styles/globals.css";
 // Dark mode: vibrant indigo/purple/blue (from moodboard index.css)
 const ORB_COLORS = {
   light: {
-    orb1: "#c7d2fe", // Light indigo
-    orb2: "#ddd6fe", // Light purple
-    orb3: "#bfdbfe", // Light blue
-    opacity: 0.3,
+    orb1: "#818cf8", // More saturated indigo (indigo-400)
+    orb2: "#a78bfa", // More saturated purple (purple-400)
+    orb3: "#60a5fa", // More saturated blue (blue-400)
+    opacity: 0.4, // Increased opacity for better visibility
   },
   dark: {
     orb1: "#6366f1", // Indigo-500
@@ -45,7 +45,7 @@ function AnimatedOrb({
       filter: "blur(60px)",
       animation: `pulse 4s ease-in-out infinite`,
       animationDelay: delay,
-      mixBlendMode: "normal",
+      mixBlendMode: "multiply",
       ...position,
     },
   });
@@ -213,11 +213,11 @@ const preview: Preview = {
       const theme = context.globals.theme || "light";
       // Get view mode to adjust styling for docs vs canvas
       const viewMode = context.viewMode || "story";
-      return React.createElement(
-        ThemeWrapper,
-        { theme, viewMode },
-        React.createElement(Story, null)
-      );
+      return React.createElement(ThemeWrapper, {
+        theme,
+        viewMode,
+        children: React.createElement(Story, null),
+      });
     },
   ],
 };

@@ -9,7 +9,6 @@
 "use client";
 
 import * as React from "react";
-import { useTheme } from "next-themes";
 
 import {
   CodeBlock as CodeBlockPrimitive,
@@ -18,6 +17,70 @@ import {
 import { cn } from "@/lib/utils";
 import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import { getStrictContext } from "@/lib/get-strict-context";
+
+/**
+ * Hook to get the current theme, with fallback for environments without
+ * next-themes provider (e.g., Storybook).
+ *
+ * First tries to use next-themes if available, otherwise detects from DOM.
+ *
+ * @returns The resolved theme ("light" or "dark")
+ */
+function useResolvedTheme(): "light" | "dark" {
+  const [theme, setTheme] = React.useState<"light" | "dark">(() => {
+    // Initial SSR-safe detection
+    if (typeof window === "undefined") {
+      return "light";
+    }
+    const root = document.documentElement;
+    const dataTheme = root.getAttribute("data-theme");
+    if (dataTheme === "dark") return "dark";
+    if (root.classList.contains("dark")) return "dark";
+    return "light";
+  });
+
+  React.useEffect(() => {
+    // Try to use next-themes if available
+    const unsubscribe: (() => void) | null = null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require("next-themes");
+      // Note: We can't call hooks here, but next-themes sets DOM attributes
+      // that we can observe, so we'll detect from DOM
+    } catch {
+      // next-themes not available, will use DOM detection only
+    }
+
+    // Detect theme from DOM
+    const detectTheme = (): "light" | "dark" => {
+      const root = document.documentElement;
+      const dataTheme = root.getAttribute("data-theme");
+      if (dataTheme === "dark") return "dark";
+      if (root.classList.contains("dark")) return "dark";
+      return "light";
+    };
+
+    // Update theme on mount
+    setTheme(detectTheme());
+
+    // Watch for theme changes via MutationObserver
+    const observer = new MutationObserver(() => {
+      setTheme(detectTheme());
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class"],
+    });
+
+    return () => {
+      observer.disconnect();
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
+
+  return theme;
+}
 
 /**
  * Context type for sharing code content between compound components.
@@ -156,8 +219,9 @@ type CodeBlockProps = Omit<CodeBlockPropsPrimitive, "code"> & {
  * Code display section with syntax highlighting.
  *
  * Renders the actual code content with syntax highlighting using Shiki.
- * Automatically uses the theme from next-themes and receives code from parent
- * Code context. Supports typewriter animation and cursor display.
+ * Automatically detects theme from next-themes (if available) or DOM attributes
+ * (data-theme or dark class) and receives code from parent Code context.
+ * Supports typewriter animation and cursor display.
  *
  * @example
  *   ```tsx
@@ -188,7 +252,7 @@ type CodeBlockProps = Omit<CodeBlockPropsPrimitive, "code"> & {
  * @see {@link CodeBlockPrimitive}
  */
 function CodeBlock({ cursor, className, ...props }: CodeBlockProps) {
-  const { resolvedTheme } = useTheme();
+  const resolvedTheme = useResolvedTheme();
   const { code } = useCode();
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -196,7 +260,7 @@ function CodeBlock({ cursor, className, ...props }: CodeBlockProps) {
     <CodeBlockPrimitive
       ref={scrollRef}
       data-slot="code-block"
-      theme={resolvedTheme === "dark" ? "dark" : "light"}
+      theme={resolvedTheme}
       scrollContainerRef={scrollRef}
       className={cn(
         "relative text-sm p-4 overflow-auto",

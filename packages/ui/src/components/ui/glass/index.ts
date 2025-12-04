@@ -64,3 +64,41 @@ export {
   DialogDescription as GlassDialogDescription,
   type DialogContentProps as GlassDialogContentProps,
 } from "./dialog";
+
+// Avatar
+export {
+  Avatar as GlassAvatar,
+  AvatarImage as GlassAvatarImage,
+  AvatarFallback as GlassAvatarFallback,
+  type AvatarProps as GlassAvatarProps,
+} from "./avatar";
+
+// Badge
+export {
+  Badge as GlassBadge,
+  type BadgeProps as GlassBadgeProps,
+} from "./badge";
+
+// Card
+export {
+  Card as GlassCard,
+  CardHeader as GlassCardHeader,
+  CardTitle as GlassCardTitle,
+  CardDescription as GlassCardDescription,
+  CardContent as GlassCardContent,
+  CardFooter as GlassCardFooter,
+  type CardProps as GlassCardProps,
+} from "./card";
+
+// Table
+export {
+  Table as GlassTable,
+  TableHeader as GlassTableHeader,
+  TableBody as GlassTableBody,
+  TableFooter as GlassTableFooter,
+  TableRow as GlassTableRow,
+  TableHead as GlassTableHead,
+  TableCell as GlassTableCell,
+  TableCaption as GlassTableCaption,
+  type TableProps as GlassTableProps,
+} from "./table";

@@ -1,5 +1,5 @@
 /* Import the repo custom styles from the @convergence/tailwind package */
 @import "@convergence/tailwind-config/globals.css";
 
-/* Import theme CSS custom properties */
-@import "./themes.css";
+/* Import the convergence theme */
+@import "@convergence/tailwind-config/themes/convergence.css";

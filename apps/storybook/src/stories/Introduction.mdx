@@ -1,5 +1,11 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 import { Introduction } from "./helpers/Introduction";
+import {
+  Code,
+  CodeHeader,
+  CodeBlock,
+} from "@convergence/ui/components";
+import { ColorPaletteTable } from "./helpers/ColorPaletteTable";
 
 <Meta title="Introduction" />
 
@@ -17,14 +23,14 @@ Convergence UI is a modern component library built with React, TypeScript, and T
 
 Install the package:
 
-```bash
-pnpm add @convergence/ui
-```
+<Code code="pnpm add @convergence/ui">
+  <CodeHeader copyButton>Installation</CodeHeader>
+  <CodeBlock lang="bash" writing cursor />
+</Code>
 
 Include the providers in your `App.tsx`:
 
-```tsx
-import { ThemeProvider } from "@convergence/ui/providers";
+<Code code={`import { ThemeProvider } from "@convergence/ui/providers";
 
 function App() {
   return (
@@ -32,8 +38,10 @@ function App() {
       <YourApp />
     </ThemeProvider>
   );
-}
-```
+}`}>
+  <CodeHeader copyButton>App.tsx</CodeHeader>
+  <CodeBlock lang="tsx" writing cursor />
+</Code>
 
 <br />
 
@@ -52,13 +60,7 @@ function App() {
 
 The design system uses a vibrant gradient palette:
 
-| Color | Light Mode | Dark Mode | Usage |
-|-------|------------|-----------|-------|
-| Primary | `#7c3aed` | `#8b5cf6` | Primary actions, accents |
-| Indigo | `#6366f1` | `#818cf8` | Background orbs, highlights |
-| Purple | `#a855f7` | `#c084fc` | Gradient accents |
-| Blue | `#3b82f6` | `#60a5fa` | Information, links |
-| Pink | `#ec4899` | `#f472b6` | Destructive actions |
+<ColorPaletteTable />
 
 <br />
 
@@ -66,8 +68,7 @@ The design system uses a vibrant gradient palette:
 
 The library exposes CSS custom properties for easy customization:
 
-```css
-:root {
+<Code code={`:root {
   /* Background gradients */
   --bg-gradient-start: #f0f4ff;
   --bg-gradient-mid: #e8eeff;
@@ -82,49 +83,24 @@ The library exposes CSS custom properties for easy customization:
   /* Glassmorphism */
   --glass: hsla(0, 0%, 100%, 0.7);
   --glass-border: hsla(240, 6%, 90%, 0.5);
-}
-```
+}`}>
+  <CodeHeader copyButton>Design Tokens</CodeHeader>
+  <CodeBlock lang="css" writing cursor />
+</Code>
 
 <style>
   {`
   .sbdocs-content {
     max-width: 1000px;
   }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-  }
-
-  th, td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--glass-border, rgba(200, 200, 220, 0.3));
-  }
-
-  th {
-    font-weight: 600;
-  }
-
-  code {
-    background: var(--glass, rgba(200, 200, 220, 0.2));
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-  }
-
-  pre {
-    background: var(--glass, rgba(200, 200, 220, 0.2)) !important;
-    border: 1px solid var(--glass-border, rgba(200, 200, 220, 0.3));
-    border-radius: 0.5rem;
-    padding: 1rem;
-    overflow-x: auto;
-  }
-
-  pre code {
-    background: transparent;
-    padding: 0;
+  
+  /* Remove top/bottom padding from table-head elements in Introduction page, keep left/right at 8px */
+  [data-slot="table-head"],
+  [data-slot="table-head"] th {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0.5rem !important; /* 8px - keep horizontal padding */
+    padding-right: 0.5rem !important; /* 8px - keep horizontal padding */
   }
   `}
 </style>

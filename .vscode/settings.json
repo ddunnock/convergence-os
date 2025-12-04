@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.css": "css"
+  },
+  "css.validate": true,
+  "typescript.validate.enable": false,
+  "[css]": {
+    "editor.defaultFormatter": null
+  }
+}
