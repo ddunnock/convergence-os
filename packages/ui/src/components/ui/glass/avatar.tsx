@@ -104,8 +104,14 @@ export const Avatar = React.forwardRef<
       ref={ref}
       className={cn(
         sizeClasses[size],
-        glow && "ring-2 ring-purple-500/30 shadow-lg shadow-purple-500/20",
-        "transition-all duration-200",
+        // Glass effect styling
+        "bg-glass-bg/80 backdrop-blur-md border-2 border-glass-border",
+        "shadow-glass",
+        // Glow effect - colored glow instead of drop shadow
+        glow &&
+          "[box-shadow:0_0_15px_hsl(var(--primary)/0.6),0_0_30px_hsl(var(--primary)/0.4)] hover:[box-shadow:0_0_20px_hsl(var(--primary)/0.8),0_0_40px_hsl(var(--primary)/0.6)] hover:ring-2 hover:ring-primary/70",
+        // Transitions
+        "transition-all duration-300 hover:scale-105",
         className
       )}
       {...props}
@@ -115,17 +121,45 @@ export const Avatar = React.forwardRef<
 Avatar.displayName = "Avatar";
 
 /**
- * Image component for the Avatar. Displays the user's profile picture or other
- * avatar image.
+ * Glass-styled image component for the Avatar. Displays the user's profile
+ * picture with glassmorphism effects applied.
  *
  * @see {@link https://www.radix-ui.com/primitives/docs/components/avatar Radix UI Avatar}
  */
-export { AvatarImage };
+export const GlassAvatarImage = React.forwardRef<
+  React.ElementRef<typeof AvatarImage>,
+  React.ComponentProps<typeof AvatarImage>
+>(({ className, ...props }, ref) => {
+  return (
+    <AvatarImage
+      ref={ref}
+      className={cn("rounded-full", className)}
+      {...props}
+    />
+  );
+});
+GlassAvatarImage.displayName = "GlassAvatarImage";
 
 /**
- * Fallback component for the Avatar. Displayed when the image fails to load or
- * is not provided. Typically shows user initials or a placeholder icon.
+ * Glass-styled fallback component for the Avatar. Displayed when the image
+ * fails to load or is not provided. Features glassmorphism styling with
+ * backdrop blur and transparency.
  *
  * @see {@link https://www.radix-ui.com/primitives/docs/components/avatar Radix UI Avatar}
  */
-export { AvatarFallback };
+export const GlassAvatarFallback = React.forwardRef<
+  React.ElementRef<typeof AvatarFallback>,
+  React.ComponentProps<typeof AvatarFallback>
+>(({ className, ...props }, ref) => {
+  return (
+    <AvatarFallback
+      ref={ref}
+      className={cn(
+        "bg-glass-bg/60 backdrop-blur-sm text-foreground font-semibold",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+GlassAvatarFallback.displayName = "GlassAvatarFallback";

@@ -149,7 +149,8 @@ function ThemeWrapper({
   return React.createElement(
     "div",
     {
-      "data-theme": theme,
+      "data-theme": "convergence",
+      className: theme === "dark" ? "dark" : "",
       style: wrapperStyle,
     },
     // Animated background

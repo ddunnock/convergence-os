@@ -1,0 +1,67 @@
+<style>
+  /* Target the brand logo image with maximum specificity */
+  a[title="Convergence UI"] img[src="./logo.png"][alt="Convergence UI"],
+  a[title="Convergence UI"] img[alt="Convergence UI"],
+  a[href="./"] img[src="./logo.png"],
+  img[src="./logo.png"][alt="Convergence UI"] {
+    /* Force explicit dimensions - new logo is 1339x554 (aspect ratio ~2.42:1) */
+    height: 100px !important;
+    width: 242px !important;
+    max-width: 500px !important;
+    max-height: none !important;
+    min-height: 100px !important;
+    min-width: 242px !important;
+    /* Remove any constraints */
+    object-fit: contain !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    /* Remove any transforms that might be scaling it */
+    transform: none !important;
+    scale: none !important;
+    /* Remove overflow clipping */
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+    /* Ensure image renders at full size */
+    image-rendering: auto !important;
+    /* Force rendering */
+    position: relative !important;
+    z-index: 1 !important;
+    /* Remove any aspect ratio constraints */
+    aspect-ratio: auto !important;
+  }
+  
+  /* Target the anchor container */
+  a[title="Convergence UI"] {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-height: 100px !important;
+    height: 100px !important;
+    overflow: visible !important;
+    max-width: none !important;
+    width: auto !important;
+    padding: 0 !important;
+    /* Ensure container doesn't clip */
+    clip-path: none !important;
+    clip: auto !important;
+  }
+  
+  /* Target any parent containers that might constrain */
+  [data-side="left"] > div:first-child,
+  [data-side="left"] > div:first-child > a {
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+    clip-path: none !important;
+    clip: auto !important;
+  }
+  
+  /* Remove any Storybook transforms or scaling */
+  [data-side="left"] > div:first-child img,
+  [data-side="left"] > div:first-child > a img {
+    transform: none !important;
+    scale: none !important;
+  }
+</style>
+

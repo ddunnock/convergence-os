@@ -68,8 +68,8 @@ export {
 // Avatar
 export {
   Avatar as GlassAvatar,
-  AvatarImage as GlassAvatarImage,
-  AvatarFallback as GlassAvatarFallback,
+  GlassAvatarImage,
+  GlassAvatarFallback,
   type AvatarProps as GlassAvatarProps,
 } from "./avatar";
 
@@ -102,3 +102,33 @@ export {
   TableCaption as GlassTableCaption,
   type TableProps as GlassTableProps,
 } from "./table";
+
+// Breadcrumb
+export {
+  BreadcrumbList as GlassBreadcrumbList,
+  Breadcrumb as GlassBreadcrumb,
+  BreadcrumbItem as GlassBreadcrumbItem,
+  BreadcrumbLink as GlassBreadcrumbLink,
+  BreadcrumbPage as GlassBreadcrumbPage,
+  BreadcrumbSeparator as GlassBreadcrumbSeparator,
+  BreadcrumbEllipsis as GlassBreadcrumbEllipsis,
+  type BreadcrumbListProps as GlassBreadcrumbListProps,
+} from "./breadcrumb";
+
+// Button Group
+export {
+  ButtonGroup as GlassButtonGroup,
+  type ButtonGroupProps as GlassButtonGroupProps,
+} from "./button-group";
+
+// Calendar
+export {
+  Calendar as GlassCalendar,
+  type CalendarProps as GlassCalendarProps,
+} from "./calendar";
+
+// Carousel
+export {
+  Carousel as GlassCarousel,
+  type CarouselProps as GlassCarouselProps,
+} from "./carousel";

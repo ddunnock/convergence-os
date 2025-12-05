@@ -10,5 +10,13 @@ const config: StorybookConfig = {
   ],
   framework: "@storybook/nextjs-vite",
   staticDirs: ["../public"],
+  managerHead: (head) => `
+    ${head}
+    <link rel="icon" href="./favicon.ico" />
+  `,
+  features: {
+    buildStoriesJson: false,
+  },
 };
+
 export default config;

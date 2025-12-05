@@ -121,8 +121,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         style={{ ...glassStyle, ...style }}
         className={cn(
           "relative overflow-hidden",
-          "bg-glass-bg backdrop-blur-md border border-glass-border",
-          "shadow-glass",
+          "bg-glass-bg backdrop-blur-md border-2 border-white/30",
+          "shadow-md shadow-black/20",
           hoverEffects({ hover: effect }),
           className
         )}

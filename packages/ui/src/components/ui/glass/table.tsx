@@ -110,8 +110,9 @@ export const Table = React.forwardRef<HTMLTableElement, TableProps>(
       <BaseTable
         ref={ref}
         className={cn(
-          "border-glass-border rounded-lg border bg-glass-bg/50 backdrop-blur-sm",
-          glow && "shadow-lg shadow-purple-500/20",
+          "border-glass-border rounded-lg border bg-glass-bg/30 backdrop-blur-md",
+          glow &&
+            "[box-shadow:0_0_20px_hsl(var(--primary)/0.5),0_0_40px_hsl(var(--primary)/0.3)] ring-2 ring-primary/30",
           className
         )}
         {...props}

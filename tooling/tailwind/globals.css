@@ -27,6 +27,14 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
+   SOURCE DIRECTIVES - Tell Tailwind where to scan for classes
+   ============================================================================ */
+
+@source "../../packages/ui/src/components/**/*.{ts,tsx}";
+@source "../../apps/storybook/src/**/*.{ts,tsx,mdx}";
+@source "../../apps/web/src/**/*.{ts,tsx}";
+
+/* ============================================================================
    THEME VARIABLE MAPPINGS
    ============================================================================ */
 

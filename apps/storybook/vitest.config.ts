@@ -21,6 +21,17 @@ export default defineConfig({
       "@": path.join(dirname, "src"),
     },
   },
+  optimizeDeps: {
+    include: [
+      // Pre-optimize dependencies that were causing "Vite unexpectedly reloaded" warnings
+      // These are the dependencies that were being optimized during test execution
+      "clsx",
+      "tailwind-merge",
+      "motion/react",
+      "shiki",
+      "@radix-ui/react-dialog",
+    ],
+  },
   test: {
     coverage: {
       provider: "v8",
@@ -40,7 +51,11 @@ export default defineConfig({
         plugins: [
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-          storybookTest({ configDir: path.join(dirname, ".storybook") }),
+          storybookTest({
+            configDir: path.join(dirname, ".storybook"),
+            storybookUrl: "http://localhost:6006",
+            storybookScript: "pnpm storybook --no-open",
+          }),
         ],
         test: {
           name: "storybook",

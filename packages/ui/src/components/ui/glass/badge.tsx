@@ -93,7 +93,8 @@ export function Badge({
     <BaseBadge
       className={cn(
         "relative overflow-hidden border-glass-border bg-glass-bg backdrop-blur-sm",
-        glow && "shadow-lg shadow-purple-500/30",
+        glow &&
+          "[box-shadow:0_0_10px_hsl(var(--primary)/0.6),0_0_20px_hsl(var(--primary)/0.4)]",
         "transition-all duration-200",
         hoverEffects({ hover }),
         className

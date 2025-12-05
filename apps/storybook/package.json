@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@convergence/ui": "workspace:*",
+    "@tanstack/react-table": "^8.21.3",
     "lucide-react": "^0.468.0",
     "next": "16.0.6",
     "react": "19.2.0",
@@ -32,6 +33,7 @@
     "@storybook/addon-mcp": "^0.1.4",
     "@storybook/addon-vitest": "^10.1.2",
     "@storybook/nextjs-vite": "^10.1.2",
+    "@storybook/theming": "^8.6.14",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",

@@ -5,6 +5,7 @@ interface ColorSwatchProps {
   readonly color: string;
   readonly textColor?: string;
   readonly size?: "sm" | "md" | "lg";
+  readonly isGlass?: boolean;
 }
 
 /**
@@ -16,13 +17,14 @@ export function ColorSwatch({
   color,
   textColor = "white",
   size = "md",
+  isGlass = false,
 }: ColorSwatchProps) {
   const [copied, setCopied] = useState(false);
 
   const sizeClasses = {
-    sm: "w-16 h-16",
-    md: "w-20 h-20",
-    lg: "w-24 h-24",
+    sm: "min-w-16 h-16 px-2 w-auto",
+    md: "min-w-20 h-20 px-2.5 w-auto",
+    lg: "min-w-24 h-24 px-3 w-auto",
   };
 
   const handleCopy = useCallback(async () => {
@@ -35,22 +37,26 @@ export function ColorSwatch({
     }
   }, [color]);
 
+  const glassClasses = isGlass
+    ? "backdrop-blur-md border border-glass-border shadow-glass"
+    : "border border-white/20 backdrop-blur-sm";
+
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className={`${sizeClasses[size]} rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg border border-white/20 backdrop-blur-sm`}
+      className={`${sizeClasses[size]} rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg ${glassClasses} shrink-0`}
       style={{ backgroundColor: color }}
       title={`Click to copy: ${color}`}
     >
       <span
-        className="text-xs font-medium opacity-90"
+        className="text-xs font-medium opacity-90 text-center whitespace-nowrap"
         style={{ color: textColor }}
       >
         {copied ? "Copied!" : name}
       </span>
       <span
-        className="text-[10px] font-mono opacity-70"
+        className="text-[10px] font-mono opacity-70 text-center whitespace-nowrap"
         style={{ color: textColor }}
       >
         {color}
@@ -67,8 +73,10 @@ interface ColorSwatchGroupProps {
     name: string;
     color: string;
     textColor?: string;
+    isGlass?: boolean;
   }>;
   readonly size?: "sm" | "md" | "lg";
+  readonly isGlass?: boolean;
 }
 
 /** A group of color swatches with a title. */
@@ -76,13 +84,19 @@ export function ColorSwatchGroup({
   title,
   colors,
   size = "md",
+  isGlass = false,
 }: ColorSwatchGroupProps) {
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-semibold text-current opacity-80">{title}</h4>
       <div className="flex flex-wrap gap-3">
         {colors.map((c) => (
-          <ColorSwatch key={c.name} {...c} size={size} />
+          <ColorSwatch
+            key={c.name}
+            {...c}
+            size={size}
+            isGlass={isGlass || c.isGlass}
+          />
         ))}
       </div>
     </div>

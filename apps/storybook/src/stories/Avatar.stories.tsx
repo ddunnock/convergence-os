@@ -54,18 +54,18 @@ export const BaseSizes: Story = {
       { className: "flex items-center gap-4" },
       React.createElement(
         BaseAvatar,
-        null,
-        React.createElement(AvatarFallback, { className: "h-8 w-8" }, "SM")
+        { className: "h-8 w-8" },
+        React.createElement(AvatarFallback, null, "SM")
       ),
       React.createElement(
         BaseAvatar,
-        null,
+        { className: "h-10 w-10" },
         React.createElement(AvatarFallback, null, "MD")
       ),
       React.createElement(
         BaseAvatar,
-        null,
-        React.createElement(AvatarFallback, { className: "h-16 w-16" }, "LG")
+        { className: "h-16 w-16" },
+        React.createElement(AvatarFallback, null, "LG")
       )
     ),
 };
